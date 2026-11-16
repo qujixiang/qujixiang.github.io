@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Academy</title>
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/course.css">
+  <style>
+    .home {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-5);
+    }
+
+    .home__hero { margin-bottom: var(--space-7); }
+
+    .home__title {
+      font-size: 2.75rem;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-3);
+    }
+
+    .home__lead {
+      font-size: 1.1rem;
+      color: var(--ink-500);
+      max-width: 560px;
+    }
+
+    .subject-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .subject-card {
+      display: block;
+      padding: var(--space-5);
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      color: inherit;
+      transition: all .18s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .subject-card--active:hover {
+      border-color: var(--gold-300);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      text-decoration: none;
+    }
+
+    .subject-card__badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--gold-100);
+      color: var(--gold-600);
+      margin-bottom: var(--space-3);
+    }
+
+    .subject-card__title {
+      font-size: 1.35rem;
+      font-weight: 750;
+      color: var(--ink-900);
+      margin-bottom: var(--space-2);
+    }
+
+    .subject-card__desc {
+      font-size: 14px;
+      color: var(--ink-500);
+      line-height: 1.7;
+      margin-bottom: var(--space-4);
+    }
+
+    .subject-card__meta {
+      display: flex;
+      gap: var(--space-4);
+      font-size: 13px;
+      color: var(--ink-300);
+    }
+
+    .subject-card--soon {
+      opacity: .55;
+      border-style: dashed;
+      cursor: default;
+    }
+
+    .home__foot {
+      margin-top: var(--space-8);
+      padding-top: var(--space-5);
+      border-top: 1px solid var(--ink-100);
+      font-size: 13px;
+      color: var(--ink-300);
+    }
+  </style>
+</head>
+<body>
+  <main class="home">
+    <header class="home__hero">
+      <div class="hero__eyebrow">Learning Lab</div>
+      <h1 class="home__title">Knowledge Academy</h1>
+      <p class="home__lead">
+        把复杂知识拆成能看懂、能动手、能记住的短课。每个科目一套课件，每章 20 分钟。
+      </p>
+    </header>
+
+    <div class="subject-grid">
+      <a class="subject-card subject-card--active" href="finance/index.html">
+        <span class="subject-card__badge">进行中</span>
+        <div class="subject-card__title">金融</div>
+        <p class="subject-card__desc">
+          从「钱是什么」讲到看懂公司、管理风险、安排自己的钱。零基础友好，强调先建立直觉。
+        </p>
+        <div class="subject-card__meta">
+          <span>26 讲</span>
+          <span>7 个模块</span>
+          <span>约 13 小时</span>
+        </div>
+      </a>
+
+      <div class="subject-card subject-card--soon">
+        <span class="subject-card__badge" style="background: var(--bg-soft); color: var(--ink-300);">敬请期待</span>
+        <div class="subject-card__title">下一门科目</div>
+        <p class="subject-card__desc">
+          项目结构已就绪，新增科目只需在根目录建一个学科文件夹，复用同一套样式与测验组件。
+        </p>
+        <div class="subject-card__meta">
+          <span>待规划</span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="home__foot">
+      Knowledge Academy · 本地离线课件 · 纯静态 HTML
+    </footer>
+  </main>
+</body>
+</html>

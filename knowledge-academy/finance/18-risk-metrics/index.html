@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 18 章 · 风险度量：怎么衡量「风险大」 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-4) var(--space-3);
+      box-shadow: var(--shadow-sm);
+      margin: var(--space-5) 0;
+    }
+    .chart-card__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      padding: 0 var(--space-2) var(--space-2);
+    }
+    .chart-card__title { font-weight: 700; color: var(--ink-900); font-size: 14px; }
+    .chart-card__hint { font-size: 12px; color: var(--ink-300); }
+    .chart { display: block; width: 100%; height: auto; }
+
+    .legend { display: flex; gap: var(--space-4); flex-wrap: wrap; padding: 0 var(--space-2); }
+    .legend__item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-500); }
+    .legend__swatch { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+
+    .metric-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-5) 0;
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      font-size: 0.95rem;
+    }
+    .metric-table th, .metric-table td {
+      padding: var(--space-3) var(--space-4);
+      text-align: right;
+      border-bottom: 1px solid var(--ink-100);
+    }
+    .metric-table th:first-child, .metric-table td:first-child {
+      text-align: left;
+      font-weight: 600;
+      color: var(--ink-900);
+    }
+    .metric-table thead th {
+      font-size: 12px;
+      color: var(--ink-300);
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      background: var(--bg-soft);
+    }
+    .metric-table tbody tr:last-child td { border-bottom: none; }
+    .metric-table td { font-variant-numeric: tabular-nums; color: var(--ink-700); }
+    .metric-table td.is-best {
+      color: var(--gold-600);
+      font-weight: 700;
+      background: #fffdf7;
+    }
+    .metric-table .unit { font-size: 12px; color: var(--ink-300); }
+
+    .formula-box {
+      padding: var(--space-4);
+      background: var(--ink-900);
+      color: #e2e8f0;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      text-align: center;
+      overflow-x: auto;
+      margin: var(--space-4) 0;
+      line-height: 2;
+    }
+    .formula-box span { color: var(--gold-300); }
+
+    .takeaway {
+      display: grid;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .takeaway__item {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-md);
+    }
+    .takeaway__num {
+      flex-shrink: 0;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--ink-900);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .takeaway__body { font-size: 0.96rem; }
+    .takeaway__body strong { display: block; margin-bottom: 2px; }
+
+    .recovery-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: var(--space-4) 0;
+    }
+    .recovery-table th, .recovery-table td {
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--ink-100);
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .recovery-table th { font-size: 12px; color: var(--ink-300); background: var(--bg-soft); }
+    .recovery-table td:first-child { font-weight: 600; color: var(--danger-600); }
+    .recovery-table td:last-child { font-weight: 700; color: var(--gold-600); }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：同一条曲线，两种命运</a>
+        <a class="sidebar__link" href="#volatility">波动率：20% 是什么概念</a>
+        <a class="sidebar__link" href="#drawdown">最大回撤：最坏会亏多少</a>
+        <a class="sidebar__link" href="#var">VaR：95% 的概率下</a>
+        <a class="sidebar__link" href="#sharpe">夏普比率：风险调整后的收益</a>
+        <a class="sidebar__link" href="#lab">动手：两条净值曲线的对比</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块五 · 风险与人性</div>
+        <h1 class="hero__title">风险度量：怎么衡量「风险大」</h1>
+        <p class="hero__lead">
+          「这只基金风险大」是一句没有信息量的话。风险到底有多大？
+          是波动大，还是会亏掉一半，还是最坏情况下你根本拿不住？
+        </p>
+      </header>
+
+      <!-- 本章目标 -->
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>把「波动率 20%」翻译成日常语言，知道它大概意味着什么</span></li>
+          <li><span class="goal-list__check">2</span><span>看懂最大回撤、VaR、夏普比率，并知道每个指标的盲区</span></li>
+          <li><span class="goal-list__check">3</span><span>面对两条净值曲线时，能说出它们各自承担了什么、牺牲了什么</span></li>
+        </ul>
+      </section>
+
+      <!-- 开场故事 -->
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">同一条曲线，两种命运</h2>
+
+        <div class="story">
+          <div class="story__label">真实场景 · 同一轮牛熊</div>
+          <p>
+            小陈和小刘是同事，同一年开始投资，各拿 10 万元。
+          </p>
+          <p>
+            小陈选了一个看起来很无聊的组合：一半债券、一半宽基指数。
+            小刘选了过去三年涨得最猛的一只成长基金。
+          </p>
+          <p>
+            前两年，小刘每次吃饭都在报喜：第一年 +30%，第二年 +25%。
+            小陈只有 6%、7%。小刘说：「你太保守了，这样什么时候才能财务自由？」
+          </p>
+          <p>
+            第三年，市场转向。小刘的基金从高点回撤 45%。跌到 38% 的时候，
+            他实在受不了，点了「全部赎回」——「先出来看看，等稳了再进」。
+            小陈的组合回撤 12%，他没动，只是按原计划又投了一笔。
+          </p>
+          <p>
+            第五年，市场修复并创出新高。小陈的账户回到了最高点以上；
+            小刘还在等「跌回原来的位置再买」，而那个位置再也没有回去。
+          </p>
+          <div class="story__question">
+            小刘选的基金，长期年化收益明明更高。为什么最后是他亏钱？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          因为<strong>收益是曲线的终点，风险是曲线的形状</strong>。
+          一条中途能把你甩下车的曲线，它的长期收益和你没有关系。
+          这一章讲四个描述「形状」的指标：波动率、最大回撤、VaR、夏普比率。
+          它们不是预测工具，而是让你在买入之前，就知道自己要坐一趟什么样的过山车。
+        </p>
+      </section>
+
+      <!-- 波动率 -->
+      <section class="section" id="volatility">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">波动率：收益的标准差</h2>
+
+        <p>
+          <strong>波动率（Volatility）</strong>是收益率的标准差。翻译成人话：
+          <strong>一段时间的收益，平均会偏离平均值多远</strong>。
+          它不关心方向，涨 20% 和跌 20% 都算「波动」。
+        </p>
+
+        <p>
+          如果一只基金的年化波动率是 20%，在收益近似正态的假设下，粗略地说：
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">约 68%</div>
+            <div class="compare__label">的年份，收益落在 ±20% 内</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">约 95%</div>
+            <div class="compare__label">的年份，收益落在 ±40% 内</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">约 5%</div>
+            <div class="compare__label">的年份，偏离超过 40%</div>
+          </div>
+        </div>
+
+        <p>
+          注意这只是「粗略」。股票收益的分布比正态更「肥尾」——
+          极端年份出现的概率，比正态假设更高。所以波动率给的是一个量级感，
+          不是一个精确的概率承诺。
+        </p>
+
+        <div class="card">
+          <div class="card__title">不同时间尺度的波动率怎么换算</div>
+          <p style="margin-bottom: var(--space-2);">
+            年化波动率 = 月波动率 × √12 ≈ 月波动率 × 3.46；
+            年化波动率 = 日波动率 × √252 ≈ 日波动率 × 15.9。
+          </p>
+          <p style="margin-bottom:0;">
+            反过来，年化 20% 大约对应月波动 5.8%、日波动 1.26%。
+            你每天看到账户上下浮动 1% 多，长期累积起来就是 20% 的年化波动。
+          </p>
+        </div>
+
+        <p>
+          波动率的优点是简单、可比较、可计算。它也是现代组合理论的地基——
+          上一章的公式里，σ 就是它。但它有一个明显的盲区：
+          <strong>它把上涨也算成风险</strong>。一只长期上涨但过程颠簸的资产，
+          波动率会很高；可如果你能拿住，颠簸本身并不会让你亏钱。
+          所以波动率真正衡量的，是<strong>「你需不需要一颗强大的心脏」</strong>。
+        </p>
+
+        <p>
+          举个具体的例子：一个 100 万元、年化波动率 20% 的组合，
+          某一年出现 −12% 到 +28% 的收益，都算正常范围。
+          如果跌了 12%，你大概还能睡着；如果是 −25%，很多人就会开始怀疑自己的判断。
+          波动率不能告诉你今年一定会发生什么，但它能提前告诉你：
+          哪些数字属于「正常颠簸」，哪些才是真正的异常。
+        </p>
+      </section>
+
+      <!-- 最大回撤 -->
+      <section class="section" id="drawdown">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">最大回撤：最坏情况下你亏多少</h2>
+
+        <p>
+          <strong>最大回撤（Maximum Drawdown）</strong>是净值从历史最高点，
+          跌到之后最低点的最大跌幅。它回答的问题很具体：
+          <strong>如果你在最高点买入，最惨的时候账户会变成多少？</strong>
+        </p>
+
+        <p>
+          和波动率相比，最大回撤更贴近人的感受。波动率 20% 听起来只是一个数字，
+          但「最大回撤 45%」意味着 100 万变成 55 万，而且你必须在那个时刻做决定：
+          继续拿着，还是割肉离场。大多数人在后者面前会失败。
+        </p>
+
+        <h3 style="margin: var(--space-6) 0 var(--space-2);">为什么跌下去容易，涨回来难</h3>
+        <p>
+          因为亏损和回本不在同一个基数上。跌 50% 之后，你的本金只剩一半；
+          要回到原点，需要在这一半的基础上翻倍。
+        </p>
+
+        <table class="recovery-table">
+          <thead>
+            <tr><th>跌幅</th><th>剩余本金</th><th>回本需要上涨</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>−10%</td><td>90%</td><td>+11.1%</td></tr>
+            <tr><td>−20%</td><td>80%</td><td>+25.0%</td></tr>
+            <tr><td>−30%</td><td>70%</td><td>+42.9%</td></tr>
+            <tr><td>−50%</td><td>50%</td><td>+100%</td></tr>
+            <tr><td>−70%</td><td>30%</td><td>+233%</td></tr>
+          </tbody>
+        </table>
+
+        <p>
+          这张表解释了一件事：<strong>控制回撤，比追求高收益更能决定长期结果</strong>。
+          一个每年赚 20%、但某一年腰斩的策略，长期可能输给一个每年只赚 7%、
+          但最大回撤只有 12% 的策略。不是因为它赚得多，而是因为它让你留在了牌桌上。
+        </p>
+
+        <p>
+          这张表还有一个隐含的推论：如果你在亏损时卖出，你就把「账面波动」
+          变成了「永久损失」，而且失去了之后回本的机会。
+          这也是为什么第 20 章要强调，3 年内要用的钱不能放进高波动资产——
+          不是因为它一定会亏，而是因为你需要用钱的时间点，可能正好落在回本之前。
+        </p>
+
+        <div class="card card--info">
+          <div class="card__title">最大回撤的两个局限</div>
+          <p style="margin-bottom: var(--space-2);">
+            <strong>第一，它是事后指标。</strong>它告诉你过去最坏的一次有多坏，
+            不保证未来不会更坏。
+          </p>
+          <p style="margin-bottom:0;">
+            <strong>第二，它高度依赖样本期。</strong>只统计了三年牛市的基金，
+            最大回撤可能很小；不是因为它稳，而是因为它还没经历过熊市。
+            比较两只基金的回撤，一定要看同一段时间。
+          </p>
+        </div>
+      </section>
+
+      <!-- VaR -->
+      <section class="section" id="var">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">VaR：95% 的概率下，最多亏多少</h2>
+
+        <p>
+          <strong>VaR（Value at Risk，在险价值）</strong>是金融机构最常用的风险指标之一。
+          它把风险和概率绑在一起：
+          <strong>在给定的置信水平和时间窗口下，你的损失大概率不会超过多少。</strong>
+        </p>
+
+        <div class="card card--gold">
+          <div class="card__title">一个例子</div>
+          <p style="margin-bottom:0;">
+            某组合的「1 日 VaR（95%）= 3 万元」。意思是：在 100 个交易日里，
+            大约有 95 天的亏损不超过 3 万元，剩下约 5 天的亏损会<strong>超过</strong> 3 万元。
+            注意措辞——它说的是「超过」，不是「最多」。
+          </p>
+        </div>
+
+        <p>
+          这就是 VaR 最容易被误读的地方。很多人把它理解成「最大亏损」，
+          但它其实是一条分界线：线以内的日子占 95%，线以外的日子占 5%，
+          而线以外到底有多惨，VaR 完全不告诉你。2008 年金融危机中，
+          很多机构的 VaR 模型显示风险可控，但真正的尾部损失远远超出模型预期。
+        </p>
+
+        <p>
+          为了补这个漏洞，业界又发明了 <strong>CVaR</strong>（也叫 Expected Shortfall）：
+          它计算的是「在最坏的 5% 情况下，平均会亏多少」。
+          如果说 VaR 是「门槛」，CVaR 就是「门槛外面的平均水深」。
+        </p>
+
+        <div class="takeaway">
+          <div class="takeaway__item">
+            <span class="takeaway__num">1</span>
+            <div class="takeaway__body">
+              <strong>VaR 依赖历史数据和分布假设</strong>
+              历史没发生过的事，模型给不了概率；市场结构变了，模型也会失效。
+            </div>
+          </div>
+          <div class="takeaway__item">
+            <span class="takeaway__num">2</span>
+            <div class="takeaway__body">
+              <strong>VaR 不描述尾部</strong>
+              它只划一条线，不告诉你线外有多深。看 VaR 时，最好同时看 CVaR 或最大回撤。
+            </div>
+          </div>
+          <div class="takeaway__item">
+            <span class="takeaway__num">3</span>
+            <div class="takeaway__body">
+              <strong>置信水平要一起说</strong>
+              「VaR = 3 万」没有意义，「95% 置信水平下、1 日 VaR = 3 万」才是完整表述。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 夏普比率 -->
+      <section class="section" id="sharpe">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">夏普比率：每承担一单位风险，换来多少收益</h2>
+
+        <p>
+          波动率告诉你「有多颠」，收益告诉你「跑得多快」，但这两件事经常冲突：
+          一个策略赚得多，也可能是因为它承担了更多风险。
+          有没有一个指标，能把两者放在一起比较？
+        </p>
+
+        <div class="formula-box">
+          夏普比率 = ( <span>年化收益</span> − 无风险利率 ) ÷ <span>年化波动率</span>
+        </div>
+
+        <p>
+          分母是「你承担的风险」，分子是「超出无风险利率的额外收益」。
+          所以夏普比率的含义是：<strong>每多承担一单位波动，你能换来多少超额收益</strong>。
+          它越高，说明这个策略的「性价比」越好。
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">&lt; 0.5</div>
+            <div class="compare__label">性价比一般</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">0.5 – 1</div>
+            <div class="compare__label">尚可，多数策略的常态</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">&gt; 1</div>
+            <div class="compare__label">优秀，但要先怀疑一下</div>
+          </div>
+        </div>
+
+        <p>
+          这些刻度只是经验值，不是标准答案。更重要的是：
+          <strong>夏普比率必须和同类策略比、和同一段时间比</strong>。
+          拿一个债券策略的夏普去比一个股票策略，没有意义；
+          拿一段牛市的数据算出来的夏普，也说明不了它在熊市里的表现。
+        </p>
+
+        <div class="card">
+          <div class="card__title">夏普比率的四个盲区</div>
+          <p style="margin-bottom: var(--space-2);">
+            <strong>一，它惩罚向上波动。</strong>一个经常暴涨的策略，波动率很高，
+            夏普会被拉低，即使这些暴涨对你有利。
+          </p>
+          <p style="margin-bottom: var(--space-2);">
+            <strong>二，它假设收益近似正态。</strong>对肥尾、极端事件不敏感。
+          </p>
+          <p style="margin-bottom: var(--space-2);">
+            <strong>三，它对杠杆敏感。</strong>加杠杆可以同时放大分子和分母，
+            但不会改变策略本身的质量。
+          </p>
+          <p style="margin-bottom:0;">
+            <strong>四，它只看历史。</strong>过去的夏普不代表未来，
+            尤其是样本期很短的时候。
+          </p>
+        </div>
+
+        <p>
+          如果夏普的盲区让你不安，可以再看一个更关注「下跌」的指标：
+          <strong>卡玛比率（Calmar Ratio）= 年化收益 ÷ |最大回撤|</strong>。
+          它不关心日常波动，只关心最坏的那一段。两个指标一起看，
+          比只看一个更接近真相。
+        </p>
+      </section>
+
+      <div class="card card--gold">
+        <div class="card__title">四个指标怎么配合看</div>
+        <p style="margin-bottom:0;">
+          单独看任何一个指标都会失真。波动率告诉你日常有多颠，
+          最大回撤告诉你最坏有多惨，VaR 告诉你小概率的边界在哪里，
+          夏普告诉你性价比高不高。把它们放在一起，你才能回答一个完整的问题：
+          <strong>这个组合的收益，值不值得我承受它的过程？</strong>
+          如果答案是否定的，再高的收益也和你无关——因为你拿不住。
+        </p>
+      </div>
+
+      <!-- 交互实验室 -->
+      <section class="section" id="lab">
+        <div class="section__label">动手看看</div>
+        <h2 class="section__title">两条净值曲线，四项指标</h2>
+
+        <p>
+          下面是两个组合过去 10 年（120 个月）的模拟净值。
+          组合 A 是稳健型（约 40% 股票、60% 债券），组合 B 是激进型（约 90% 股票）。
+          先别急着看下面的表格，试着用眼睛判断：
+          <strong>哪条曲线让你更可能在中途放弃？</strong>
+        </p>
+
+        <div class="chart-card">
+          <div class="chart-card__head">
+            <div class="chart-card__title">净值走势（起点 = 1.00）</div>
+            <div class="chart-card__hint">月度数据 · 共 10 年</div>
+          </div>
+          <svg class="chart" id="nav-chart" viewBox="0 0 680 360" role="img" aria-label="稳健组合与激进组合的十年净值曲线对比"></svg>
+          <div class="legend">
+            <span class="legend__item"><span class="legend__swatch" style="background:#b45309;"></span>组合 A · 稳健</span>
+            <span class="legend__item"><span class="legend__swatch" style="background:#1d4ed8;"></span>组合 B · 激进</span>
+            <span class="legend__item"><span class="legend__swatch" style="background:rgba(185,28,28,.35);height:10px;border-radius:2px;"></span>B 的最大回撤区间</span>
+          </div>
+        </div>
+
+        <table class="metric-table">
+          <thead>
+            <tr><th>指标</th><th>组合 A · 稳健</th><th>组合 B · 激进</th></tr>
+          </thead>
+          <tbody id="metric-body"></tbody>
+        </table>
+
+        <p id="lab-summary"></p>
+
+        <div class="card card--gold">
+          <div class="card__title">怎么读这张表</div>
+          <p style="margin-bottom: var(--space-2);">
+            组合 B 的年化收益几乎是 A 的两倍，但它的波动率是 A 的 2.7 倍，
+            最大回撤是 A 的 3 倍。代价是：在最坏的那一刻，B 的账户只剩下约六成，
+            而人要在这个时刻保持理性，是非常难的。
+          </p>
+          <p style="margin-bottom:0;">
+            夏普比率给出的结论更微妙：<strong>A 的风险调整后收益反而更高</strong>。
+            这不代表 B 不好——如果 B 的持有者能扛住 37% 的回撤、并且十年不用这笔钱，
+            B 的终值确实更高。指标不是替你选，而是让你知道自己在选什么。
+          </p>
+        </div>
+      </section>
+
+      <!-- 误区 -->
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">风险就是波动</div>
+            <div class="myth__right">对短期交易者，波动是风险；对长期投资者，永久性损失才是真风险。波动只是路上的颠簸。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">跌 30%，涨 30% 就回本了</div>
+            <div class="myth__right">跌 30% 后剩 70%，要回到原点需要上涨 42.9%。跌幅越大，回本越难。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">夏普比率越高越好</div>
+            <div class="myth__right">要同类、同周期比较。它不描述尾部风险，样本太短时也可能被美化。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <!-- 术语卡 -->
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">波动率<span class="glossary__en">Volatility</span></div>
+            <div class="glossary__def">收益率的标准差，衡量收益围绕平均值的离散程度。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">标准差<span class="glossary__en">Standard Deviation</span></div>
+            <div class="glossary__def">统计学里衡量数据分散程度的指标，波动率就是它的年化形式。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">最大回撤<span class="glossary__en">Maximum Drawdown</span></div>
+            <div class="glossary__def">从历史最高点到之后最低点的最大跌幅，描述最坏路径。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">回本涨幅<span class="glossary__en">Recovery Gain</span></div>
+            <div class="glossary__def">亏损后回到原点需要的涨幅，等于 1 ÷ (1 − 跌幅) − 1。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">VaR<span class="glossary__en">Value at Risk</span></div>
+            <div class="glossary__def">给定置信水平和时间窗口下，损失的分界线。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">CVaR<span class="glossary__en">Conditional VaR</span></div>
+            <div class="glossary__def">超过 VaR 那条线之后，尾部损失的平均值。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">夏普比率<span class="glossary__en">Sharpe Ratio</span></div>
+            <div class="glossary__def">每承担一单位波动，换来的超额收益。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">卡玛比率<span class="glossary__en">Calmar Ratio</span></div>
+            <div class="glossary__def">年化收益除以最大回撤，更关注最坏情况。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 下一章 -->
+      <section class="section">
+        <a class="next-chapter" href="../19-behavioral-finance/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 19 章</div>
+            <div class="next-chapter__title">行为金融学：为什么聪明人也会亏钱</div>
+          </div>
+          <span class="next-chapter__link">继续 →</span>
+        </a>
+      </section>
+
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 两条净值曲线（预置月度数据，起点 1.00，共 121 个点） ---------- */
+    const NAV_A = [1.0, 1.0081, 1.0249, 0.997, 1.0243, 1.0143, 1.0191, 1.0356, 1.0419, 1.0688, 1.0753, 1.0418, 1.0078, 1.0002, 1.0052, 0.9887, 0.991, 0.9664, 0.9604, 0.9622, 0.956, 0.9445, 0.9565, 0.9746, 0.9926, 1.0011, 1.0181, 1.0216, 1.026, 1.0359, 1.0611, 1.0825, 1.1128, 1.1187, 1.148, 1.1557, 1.1812, 1.1915, 1.2049, 1.1883, 1.2018, 1.2457, 1.253, 1.2857, 1.2774, 1.2716, 1.3059, 1.3241, 1.3118, 1.3203, 1.3021, 1.3174, 1.3173, 1.2967, 1.3271, 1.3223, 1.3178, 1.3924, 1.3668, 1.3822, 1.3926, 1.3996, 1.4009, 1.471, 1.4888, 1.4812, 1.5248, 1.5302, 1.5135, 1.5184, 1.5181, 1.5085, 1.5295, 1.5005, 1.525, 1.5363, 1.5434, 1.5488, 1.5551, 1.6268, 1.5985, 1.6362, 1.6597, 1.6485, 1.6304, 1.6712, 1.6979, 1.694, 1.6979, 1.7341, 1.7107, 1.7188, 1.6947, 1.7055, 1.7591, 1.8106, 1.8078, 1.8117, 1.8289, 1.8213, 1.8483, 1.9389, 1.9684, 2.0075, 1.9745, 1.9359, 1.956, 1.975, 1.98, 1.9512, 1.9599, 1.9503, 1.9114, 1.8754, 1.8665, 1.8197, 1.8659, 1.8564, 1.8373, 1.877, 1.8659];
+    const NAV_B = [1.0, 1.049, 1.0795, 1.0994, 1.112, 1.0568, 1.015, 1.0493, 1.0952, 1.1354, 1.1612, 1.1642, 1.232, 1.2309, 1.2637, 1.204, 1.1947, 1.1501, 1.216, 1.2362, 1.3071, 1.3089, 1.2985, 1.3334, 1.4486, 1.4594, 1.4196, 1.5138, 1.4878, 1.339, 1.2051, 1.0846, 1.1442, 1.2072, 1.2736, 1.277, 1.3442, 1.2883, 1.3436, 1.4627, 1.5023, 1.5568, 1.5607, 1.5721, 1.5841, 1.6705, 1.7218, 1.6975, 1.7943, 1.7513, 1.9593, 2.0325, 2.1141, 2.1793, 2.1557, 2.1, 2.1811, 2.3272, 2.2857, 2.3919, 2.4125, 2.4737, 2.5054, 2.6014, 2.5412, 2.5017, 2.5886, 2.4472, 2.5101, 2.5676, 2.6365, 2.5495, 2.7135, 2.7435, 2.7832, 2.477, 2.2045, 1.962, 1.7462, 1.851, 1.9621, 2.0798, 2.0563, 2.1604, 2.178, 2.1405, 2.1502, 2.114, 2.0244, 2.1179, 2.2004, 2.1988, 2.2542, 2.4192, 2.397, 2.4549, 2.5496, 2.6507, 2.6158, 2.7392, 2.7198, 2.5294, 2.3523, 2.1877, 2.1968, 2.2791, 2.318, 2.4183, 2.4911, 2.616, 2.6015, 2.751, 2.7783, 2.74, 2.7608, 2.792, 3.0263, 2.9843, 3.0325, 3.0752, 3.268];
+
+    function calcStats(nav) {
+      const n = nav.length - 1;
+      const rets = [];
+      for (let i = 1; i < nav.length; i += 1) rets.push(nav[i] / nav[i - 1] - 1);
+      const mean = rets.reduce((a, b) => a + b, 0) / n;
+      const variance = rets.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (n - 1);
+      const annVol = Math.sqrt(variance) * Math.sqrt(12);
+      const ann = Math.pow(nav[nav.length - 1] / nav[0], 12 / n) - 1;
+
+      let peak = nav[0];
+      let peakIdx = 0;
+      let mdd = 0;
+      let mddPeak = 0;
+      let mddTrough = 0;
+      nav.forEach((v, i) => {
+        if (v > peak) { peak = v; peakIdx = i; }
+        const dd = v / peak - 1;
+        if (dd < mdd) { mdd = dd; mddPeak = peakIdx; mddTrough = i; }
+      });
+
+      const sharpe = (ann - 0.02) / annVol;
+      return { ann, annVol, mdd, mddPeak, mddTrough, sharpe, final: nav[nav.length - 1] };
+    }
+
+    const statsA = calcStats(NAV_A);
+    const statsB = calcStats(NAV_B);
+
+    function pct(x, digits) { return (x * 100).toFixed(digits === undefined ? 1 : digits) + '%'; }
+
+    function renderNavChart() {
+      const W = 680, H = 360, L = 56, R = 20, T = 26, B = 44;
+      const plotW = W - L - R;
+      const plotH = H - T - B;
+      const yMin = 0.8;
+      const yMax = 3.4;
+      const n = NAV_A.length - 1;
+      const xOf = (i) => L + (i / n) * plotW;
+      const yOf = (v) => T + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
+      const chart = document.getElementById('nav-chart');
+
+      let grid = '';
+      [1.0, 1.5, 2.0, 2.5, 3.0].forEach((v) => {
+        const yy = yOf(v);
+        grid += `<line x1="${L}" y1="${yy}" x2="${W - R}" y2="${yy}" stroke="#e2e8f0" stroke-width="1" />`;
+        grid += `<text x="${L - 10}" y="${yy + 4}" font-size="11" fill="#94a3b8" text-anchor="end">${v.toFixed(1)}</text>`;
+      });
+
+      for (let year = 0; year <= 10; year += 1) {
+        const xx = xOf(year * 12);
+        grid += `<line x1="${xx}" y1="${T + plotH}" x2="${xx}" y2="${T + plotH + 5}" stroke="#cbd5e1" stroke-width="1" />`;
+        grid += `<text x="${xx}" y="${H - 20}" font-size="11" fill="#94a3b8" text-anchor="middle">${year} 年</text>`;
+      }
+
+      const toPath = (nav) => nav.map((v, i) => `${i === 0 ? 'M' : 'L'}${xOf(i).toFixed(1)},${yOf(v).toFixed(1)}`).join(' ');
+
+      // B 的最大回撤区间
+      const dx1 = xOf(statsB.mddPeak);
+      const dx2 = xOf(statsB.mddTrough);
+      const shade = `<rect x="${dx1}" y="${T}" width="${Math.max(dx2 - dx1, 2)}" height="${plotH}" fill="rgba(185,28,28,0.07)" />
+        <line x1="${dx1}" y1="${T}" x2="${dx1}" y2="${T + plotH}" stroke="#b91c1c" stroke-width="1" stroke-dasharray="4 4" opacity="0.5" />
+        <line x1="${dx2}" y1="${T}" x2="${dx2}" y2="${T + plotH}" stroke="#b91c1c" stroke-width="1" stroke-dasharray="4 4" opacity="0.5" />
+        <text x="${(dx1 + dx2) / 2}" y="${T + 14}" font-size="11" font-weight="600" fill="#b91c1c" text-anchor="middle">B 最大回撤 ${pct(statsB.mdd)}</text>`;
+
+      const pointA = `<circle cx="${xOf(n)}" cy="${yOf(NAV_A[n])}" r="4" fill="#b45309" stroke="#fff" stroke-width="1.5" />
+        <text x="${xOf(n) - 8}" y="${yOf(NAV_A[n]) - 10}" font-size="11" font-weight="700" fill="#b45309" text-anchor="end">${NAV_A[n].toFixed(2)}</text>`;
+      const pointB = `<circle cx="${xOf(n)}" cy="${yOf(NAV_B[n])}" r="4" fill="#1d4ed8" stroke="#fff" stroke-width="1.5" />
+        <text x="${xOf(n) - 8}" y="${yOf(NAV_B[n]) - 10}" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="end">${NAV_B[n].toFixed(2)}</text>`;
+
+      chart.innerHTML = `
+        ${grid}
+        ${shade}
+        <path d="${toPath(NAV_B)}" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round" />
+        <path d="${toPath(NAV_A)}" fill="none" stroke="#b45309" stroke-width="2.4" stroke-linejoin="round" />
+        ${pointA}
+        ${pointB}
+        <text x="${L}" y="${T - 8}" font-size="11" fill="#94a3b8">净值</text>
+      `;
+    }
+
+    function renderMetricTable() {
+      const rows = [
+        { label: '年化收益', a: pct(statsA.ann), b: pct(statsB.ann), rawA: statsA.ann, rawB: statsB.ann, higherBetter: true },
+        { label: '年化波动率', a: pct(statsA.annVol), b: pct(statsB.annVol), rawA: statsA.annVol, rawB: statsB.annVol, higherBetter: false },
+        { label: '最大回撤', a: pct(statsA.mdd), b: pct(statsB.mdd), rawA: statsA.mdd, rawB: statsB.mdd, higherBetter: true },
+        { label: '回本需要上涨', a: pct(1 / (1 + statsA.mdd) - 1), b: pct(1 / (1 + statsB.mdd) - 1), rawA: 1 / (1 + statsA.mdd) - 1, rawB: 1 / (1 + statsB.mdd) - 1, higherBetter: false },
+        { label: '夏普比率（无风险 2%）', a: statsA.sharpe.toFixed(2), b: statsB.sharpe.toFixed(2), rawA: statsA.sharpe, rawB: statsB.sharpe, higherBetter: true },
+        { label: '10 年末净值', a: statsA.final.toFixed(2), b: statsB.final.toFixed(2), rawA: statsA.final, rawB: statsB.final, higherBetter: true }
+      ];
+
+      const body = document.getElementById('metric-body');
+      body.innerHTML = rows.map((r) => {
+        const aBetter = r.higherBetter ? r.rawA >= r.rawB : r.rawA <= r.rawB;
+        const bBetter = r.higherBetter ? r.rawB > r.rawA : r.rawB < r.rawA;
+        return `<tr>
+          <td>${r.label}</td>
+          <td class="${aBetter ? 'is-best' : ''}">${r.a}</td>
+          <td class="${bBetter ? 'is-best' : ''}">${r.b}</td>
+        </tr>`;
+      }).join('');
+
+      const diff = (statsB.ann - statsA.ann) * 100;
+      const volRatio = statsB.annVol / statsA.annVol;
+      const ddRatio = Math.abs(statsB.mdd / statsA.mdd);
+      document.getElementById('lab-summary').innerHTML =
+        `组合 B 平均每年多赚 <strong>${diff.toFixed(1)} 个百分点</strong>，代价是波动率是 A 的
+         <strong>${volRatio.toFixed(1)} 倍</strong>、最大回撤是 A 的 <strong>${ddRatio.toFixed(1)} 倍</strong>。
+         换句话说：B 的收益更高，但它在最坏时刻要求你承受的痛苦，也高出一个量级。`;
+    }
+
+    renderNavChart();
+    renderMetricTable();
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '某基金的年化波动率是 20%，下面哪种理解最准确？',
+        options: [
+          '这只基金一年最多亏 20%',
+          '这只基金一年一定赚 20%',
+          '粗略地说，约三分之二的年份收益会落在 ±20% 附近',
+          '这只基金的风险比波动率 10% 的基金低'
+        ],
+        answer: 2,
+        explain: '波动率描述收益的离散程度，不承诺上限或下限。按近似正态的经验法则，约 68% 的年份落在 ±1 个标准差内。'
+      },
+      {
+        question: '一只基金从 2 元跌到 1 元，要回到 2 元需要上涨多少？',
+        options: ['50%', '75%', '100%', '200%'],
+        answer: 2,
+        explain: '跌 50% 后本金只剩一半，要翻倍才能回到原点。跌幅越大，回本所需的涨幅越不成比例。'
+      },
+      {
+        question: '某组合「1 日 VaR（95%）= 3 万元」，正确的理解是？',
+        options: [
+          '最多只会亏 3 万元',
+          '约 5% 的交易日，亏损会超过 3 万元',
+          '每天都可能亏 3 万元',
+          '一年一定亏 3 万元'
+        ],
+        answer: 1,
+        explain: 'VaR 是一条分界线：95% 的日子里亏损不超过它，剩下约 5% 的日子里会超过它，但超过多少 VaR 不告诉你。'
+      },
+      {
+        question: '夏普比率衡量的是什么？',
+        options: [
+          '基金的最大亏损幅度',
+          '每承担一单位波动，换来的超额收益',
+          '基金跑赢指数的概率',
+          '基金每年的平均收益'
+        ],
+        answer: 1,
+        explain: '夏普比率 =（年化收益 − 无风险利率）÷ 年化波动率，衡量风险调整后的收益性价比。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch18');
+  </script>
+</body>
+</html>

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 15 章 · 财务指标与杜邦分析 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    html { color-scheme: light; }
+    /* 财务指标与杜邦分析章节专用样式 */
+    .dupont {
+      margin: var(--space-5) 0;
+      padding: var(--space-5);
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dupont__presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-bottom: var(--space-5);
+    }
+
+    .preset-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--ink-100);
+      border-radius: 999px;
+      background: var(--bg-card);
+      font: inherit;
+      font-size: 13px;
+      color: var(--ink-500);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--gold-300);
+      color: var(--gold-600);
+    }
+
+    .preset-btn.is-active {
+      background: var(--gold-100);
+      border-color: var(--gold-500);
+      color: var(--gold-600);
+      font-weight: 600;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 132px minmax(0, 1fr) 76px;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .slider-row label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink-700);
+    }
+
+    .slider-row input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold-500);
+      cursor: pointer;
+    }
+
+    .slider-row output {
+      text-align: right;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink-900);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .range-hint {
+      font-size: 11px;
+      color: var(--ink-300);
+      display: block;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .dupont__formula {
+      margin: var(--space-5) 0 var(--space-4);
+      padding: var(--space-3);
+      background: var(--bg-soft);
+      border-radius: var(--radius-md);
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink-700);
+      letter-spacing: 0.01em;
+    }
+
+    .dupont__result {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: var(--space-4);
+      align-items: center;
+      padding: var(--space-5);
+      background: var(--ink-900);
+      border-radius: var(--radius-lg);
+      color: #fff;
+    }
+
+    .dupont__roe {
+      font-size: 3rem;
+      font-weight: 750;
+      color: var(--gold-300);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dupont__roe-label {
+      font-size: 12px;
+      color: var(--ink-300);
+      letter-spacing: 0.06em;
+      margin-top: var(--space-1);
+    }
+
+    .dupont__factors {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-2);
+    }
+
+    .dupont__factor {
+      padding: var(--space-3) var(--space-2);
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      text-align: center;
+    }
+
+    .dupont__factor b {
+      display: block;
+      font-size: 1.1rem;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dupont__factor span {
+      font-size: 11px;
+      color: var(--ink-300);
+    }
+
+    .fragility {
+      margin-top: var(--space-4);
+      padding: var(--space-4);
+      background: var(--bg-soft);
+      border-radius: var(--radius-md);
+    }
+
+    .fragility__head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--ink-500);
+      margin-bottom: var(--space-2);
+    }
+
+    .fragility__head b { color: var(--ink-900); }
+
+    .fragility__track {
+      height: 10px;
+      background: var(--ink-100);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .fragility__bar {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: var(--success-600);
+      transition: width 0.35s ease, background 0.3s;
+    }
+
+    .fragility__bar.is-warn { background: var(--gold-500); }
+    .fragility__bar.is-danger { background: var(--danger-600); }
+
+    .dupont__hint {
+      margin-top: var(--space-4);
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      background: #f8faff;
+      border-left: 4px solid var(--info-600);
+      font-size: 0.95rem;
+      min-height: 96px;
+    }
+
+    .dupont__hint.is-warn {
+      background: #fffdf7;
+      border-left-color: var(--gold-500);
+    }
+
+    .dupont__hint.is-danger {
+      background: #fef7f7;
+      border-left-color: var(--danger-600);
+    }
+
+    .dupont__hint strong { display: block; margin-bottom: var(--space-2); }
+
+    .formula-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+      margin: var(--space-4) 0;
+    }
+
+    .formula-chip {
+      padding: 8px 14px;
+      background: var(--bg-soft);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink-700);
+    }
+
+    .formula-op {
+      color: var(--ink-300);
+      font-weight: 700;
+    }
+
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+
+    .model-card {
+      padding: var(--space-4);
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-md);
+    }
+
+    .model-card__name {
+      font-weight: 700;
+      color: var(--ink-900);
+      margin-bottom: var(--space-1);
+      font-size: 14px;
+    }
+
+    .model-card__tag {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--gold-600);
+      background: var(--gold-100);
+      padding: 1px 8px;
+      border-radius: 999px;
+      margin-bottom: var(--space-2);
+    }
+
+    .model-card p {
+      margin-bottom: 0;
+      font-size: 13px;
+      color: var(--ink-500);
+    }
+
+    @media (max-width: 560px) {
+      .slider-row { grid-template-columns: 100px minmax(0, 1fr) 60px; }
+      .dupont__result { grid-template-columns: 1fr; text-align: center; }
+      .dupont__roe-label { margin-bottom: var(--space-3); }
+    }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <!-- 侧边目录 -->
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：三家奶茶店</a>
+        <a class="sidebar__link" href="#dimensions">三个维度看公司</a>
+        <a class="sidebar__link" href="#roe">ROE 与 ROA</a>
+        <a class="sidebar__link" href="#dupont">杜邦拆解</a>
+        <a class="sidebar__link" href="#demo">动手：ROE 调节器</a>
+        <a class="sidebar__link" href="#redlines">财务造假三条红线</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块四 · 读懂公司</div>
+        <h1 class="hero__title">财务指标与杜邦分析</h1>
+        <p class="hero__lead">
+          两家公司 ROE 都是 20%，一家靠产品赚钱，一家靠借钱撑起来。
+          数字一样，含金量可能差十倍。
+        </p>
+      </header>
+
+      <!-- 本章目标 -->
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>用盈利能力、营运能力、偿债能力三个维度快速判断一家公司</span></li>
+          <li><span class="goal-list__check">2</span><span>把 ROE 拆成「净利率 × 周转率 × 权益乘数」，看懂它到底靠什么赚钱</span></li>
+          <li><span class="goal-list__check">3</span><span>识别高杠杆堆出来的虚假繁荣，以及财报里最危险的三条红线</span></li>
+        </ul>
+      </section>
+
+      <!-- 开场故事 -->
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">三家奶茶店，同样的 20% ROE</h2>
+
+        <div class="story">
+          <div class="story__label">一个虚构但常见的对比</div>
+          <p>
+            同一条街上，三家奶茶店。年底一算，三家老板的「净资产收益率」（ROE）都是 20%。
+            看起来一样厉害，但拆开看，完全不是一回事。
+          </p>
+          <p>
+            <strong>A 店</strong>是精品店：一杯卖 30 元，原料只要 8 元，净利率 20%；
+            一天卖 150 杯，一年下来资产周转 1 次；不借钱，权益乘数 1。
+            20% × 1 × 1 = 20%。
+          </p>
+          <p>
+            <strong>B 店</strong>是薄利多销：一杯只卖 12 元，净利率 5%；
+            但一天能卖 1200 杯，一年资产周转 4 次；也不借钱。
+            5% × 4 × 1 = 20%。
+          </p>
+          <p>
+            <strong>C 店</strong>走扩张路线：自己只出 20 万，向银行借了 80 万，一口气开五家店。
+            净利率 8%，周转 0.5 次，权益乘数 5。
+            8% × 0.5 × 5 = 20%。
+          </p>
+          <div class="story__question">
+            同样是 20%，如果明天街上新开十家奶茶店，哪一家最先倒下？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          答案是 C 店。它的 20% 里，有一大半是「借来的钱」放大的。
+          生意好的时候，杠杆是加速器；生意一差，利息和还款压力会同时压过来，
+          ROE 可能从 20% 直接变成负数。<strong>而 A 店和 B 店的 20%，是靠自己赚出来的。</strong>
+          这一章，我们就学习怎么把「一个结果」拆成「三个原因」。
+        </p>
+
+        <p>
+          换个角度说：A 店和 B 店要维持 20%，只需要守住自己的老本行——
+          A 守住毛利率，B 守住翻台率。C 店要维持 20%，却必须同时满足三个条件：
+          银行继续借钱、利率不涨、生意不下滑。依赖的条件越多，链条越容易断。
+          这就是为什么同样一个 ROE，含金量可能完全不同。
+        </p>
+      </section>
+
+      <!-- 三个维度 -->
+      <section class="section" id="dimensions">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">先看三个维度：赚得多、转得快、借得少</h2>
+
+        <p>
+          财报上的指标有几十个，但真正需要先掌握的，只有三个方向。
+          你可以把它想成评价一家餐厅：<strong>每道菜赚不赚钱、一天能翻几次台、开店的钱是自己的还是借的。</strong>
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 盈利能力：每一块钱收入，最后剩下几分</div>
+            <p>
+              <strong>毛利率 =（营业收入 − 营业成本）÷ 营业收入</strong>。
+              它衡量产品本身有没有定价权。一杯咖啡卖 30 元、原料 8 元，毛利率就是 73%。
+              毛利率高，说明品牌、技术或渠道让你能卖得比成本贵很多。
+            </p>
+            <p>
+              <strong>净利率 = 净利润 ÷ 营业收入</strong>。
+              它把房租、工资、营销、利息、税全部扣完，看最后真正剩下多少。
+              毛利率高但净利率低，通常是费用失控；两个都低，说明这门生意本身就很苦。
+            </p>
+            <div class="concept__analogy">
+              毛利率像「这道菜本身能加多少价」，净利率像「月底交完房租水电，你口袋里还能剩多少」。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 营运能力：同样的本钱，一年能转几圈</div>
+            <p>
+              <strong>总资产周转率 = 营业收入 ÷ 总资产</strong>。
+              它衡量你手里的资产一年能产生多少收入。周转率 4 次，意味着每 1 块钱资产一年做了 4 块钱的生意；
+              周转率 0.5 次，意味着两年才转一圈。
+            </p>
+            <p>
+              更细的还有<strong>存货周转率</strong>（货多久能卖掉）和<strong>应收账款周转率</strong>（钱多久能收回来）。
+              这两个指标慢下来，往往是经营出问题的第一信号：货堆在仓库、钱压在客户手里。
+            </p>
+            <div class="concept__analogy">
+              像同一笔进货钱，有人一年周转 10 次，有人一年只周转 2 次。赚的钱可能差五倍，但本钱是一样的。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 偿债能力：多少是自己的，多少是借的</div>
+            <p>
+              <strong>资产负债率 = 总负债 ÷ 总资产</strong>，衡量公司有多少家当是借来的。
+              <strong>流动比率 = 流动资产 ÷ 流动负债</strong>，衡量短期还债压力：
+              手头能快速变现的东西，够不够还一年内要还的债。
+            </p>
+            <p>
+              <strong>权益乘数 = 总资产 ÷ 所有者权益</strong>，是杠杆的倍数。
+              权益乘数 2，意味着自己出 1 块、借 1 块；权益乘数 5，意味着自己出 1 块、借 4 块。
+              它直接把「借钱」这件事变成了一个可以乘进 ROE 的数字。
+            </p>
+            <div class="concept__analogy">
+              首付 20 万买 100 万的房，权益乘数就是 5。房价涨 10%，你的本金赚 50%；
+              房价跌 10%，你的本金也亏 50%。杠杆对涨跌一视同仁。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROE 与 ROA -->
+      <section class="section" id="roe">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">ROE 与 ROA：股东的钱，和全部资产的钱</h2>
+
+        <p>
+          这两个指标经常一起出现，但问的问题不一样。
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">ROA</div>
+            <div class="compare__label">净利润 ÷ 总资产<br>不管钱是谁的，资产整体赚了多少</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">ROE</div>
+            <div class="compare__label">净利润 ÷ 所有者权益<br>只看股东自己出的那部分，赚了多少</div>
+          </div>
+        </div>
+
+        <p>
+          假设一家公司总资产 100 万，其中 80 万是借的，股东只出了 20 万。
+          一年净利润 10 万。那么 ROA = 10%，ROE = 50%。
+          差距从哪来？就是那 80 万负债——借来的钱赚到的收益，扣掉利息后，全归股东。
+        </p>
+
+        <p>
+          所以 <strong>ROE 高，可能是好事，也可能只是杠杆高</strong>。
+          巴菲特很看重 ROE，但他看的是「不需要靠大量负债、长期稳定在 15% 以上」的 ROE。
+          这句话的重点不是 15%，而是「不需要靠大量负债」。
+        </p>
+
+        <div class="card card--info">
+          <div class="card__title">一个简单的判断顺序</div>
+          <p style="margin-bottom:0;">
+            先看 ROA：这家公司用全部资产赚钱的效率高不高？
+            再看 ROE：如果 ROE 远高于 ROA，去查权益乘数——差额大概率是借来的。
+            最后看现金流：赚到的利润，有没有真的变成钱。
+          </p>
+        </div>
+      </section>
+
+      <!-- 杜邦拆解 -->
+      <section class="section" id="dupont">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">杜邦拆解：ROE 的三个来源</h2>
+
+        <p>
+          杜邦分析做的事很简单：把 ROE 这个结果，拆成三个可以分别改进的原因。
+          推导过程只有一步，你完全可以自己推出来：
+        </p>
+
+        <div class="formula-row">
+          <span class="formula-chip">ROE = 净利润 ÷ 权益</span>
+          <span class="formula-op">=</span>
+          <span class="formula-chip">净利润 ÷ 收入</span>
+          <span class="formula-op">×</span>
+          <span class="formula-chip">收入 ÷ 总资产</span>
+          <span class="formula-op">×</span>
+          <span class="formula-chip">总资产 ÷ 权益</span>
+        </div>
+
+        <p>
+          中间的收入和总资产会互相抵消，等号两边完全相等。于是得到那句著名的公式：
+        </p>
+
+        <div class="card card--gold">
+          <div class="card__title" style="justify-content:center; font-size:1.1rem;">
+            ROE = 净利率 × 总资产周转率 × 权益乘数
+          </div>
+          <p style="margin-bottom:0; text-align:center; color:var(--ink-500);">
+            赚钱能力 × 做事效率 × 借力程度
+          </p>
+        </div>
+
+        <p style="margin-top: var(--space-4);">
+          三个因子对应三种完全不同的商业模式。没有哪种一定更好，但你必须知道自己在看哪一种。
+        </p>
+
+        <div class="model-grid">
+          <div class="model-card">
+            <div class="model-card__tag">高毛利型</div>
+            <div class="model-card__name">茅台、软件、奢侈品</div>
+            <p>净利率很高，周转慢，杠杆低。靠品牌和壁垒赚钱，需求下滑时降价压力大，但不容易突然死亡。</p>
+          </div>
+          <div class="model-card">
+            <div class="model-card__tag">薄利多销型</div>
+            <div class="model-card__name">超市、代工、快递</div>
+            <p>净利率很低，周转极快，杠杆中等。靠规模和效率赚钱，最怕价格战和需求突然消失。</p>
+          </div>
+          <div class="model-card">
+            <div class="model-card__tag">高杠杆型</div>
+            <div class="model-card__name">银行、地产、重资产</div>
+            <p>净利率中等，周转慢，杠杆很高。靠借来的钱放大收益，利率上行或资产贬值时最脆弱。</p>
+          </div>
+        </div>
+
+        <p>
+          <strong>最脆弱的组合，是「净利率很低 + 权益乘数很高」。</strong>
+          利润本来就薄，经不起任何波动；杠杆又把亏损同样放大。
+          收入稍微下滑，利润可能直接归零，而利息和本金一分不能少。
+          很多看起来突然倒下的公司，都是这个组合。
+        </p>
+      </section>
+
+      <!-- 交互 -->
+      <section class="section" id="demo">
+        <div class="section__label">动手试试</div>
+        <h2 class="section__title">ROE 调节器：三个滑块，一个结果</h2>
+
+        <p>
+          拖动三个滑块，实时看 ROE 怎么变化。注意观察：同样的 ROE，
+          可能是完全不同的三种生意。下面的「组合脆弱度」会告诉你，这个组合扛不扛得住风浪。
+        </p>
+
+        <div class="dupont" id="dupont-demo">
+          <div class="dupont__presets">
+            <button type="button" class="preset-btn" data-preset="luxury">高毛利型</button>
+            <button type="button" class="preset-btn" data-preset="retail">薄利多销型</button>
+            <button type="button" class="preset-btn" data-preset="leveraged">高杠杆型</button>
+            <button type="button" class="preset-btn is-active" data-preset="balanced">均衡型</button>
+          </div>
+
+          <div class="slider-row">
+            <label for="sl-margin">净利率<span class="range-hint">每 1 元收入剩下多少</span></label>
+            <input id="sl-margin" type="range" min="1" max="30" step="0.5" value="10">
+            <output id="out-margin">10.0%</output>
+          </div>
+
+          <div class="slider-row">
+            <label for="sl-turn">总资产周转率<span class="range-hint">每 1 元资产做多少生意</span></label>
+            <input id="sl-turn" type="range" min="0.2" max="3" step="0.1" value="1.2">
+            <output id="out-turn">1.20</output>
+          </div>
+
+          <div class="slider-row">
+            <label for="sl-mult">权益乘数<span class="range-hint">总资产是净资产的几倍</span></label>
+            <input id="sl-mult" type="range" min="1" max="5" step="0.1" value="1.6">
+            <output id="out-mult">1.60</output>
+          </div>
+
+          <div class="dupont__formula">ROE = 净利率 × 总资产周转率 × 权益乘数</div>
+
+          <div class="dupont__result">
+            <div>
+              <div class="dupont__roe" id="roe-value">19.2%</div>
+              <div class="dupont__roe-label">净资产收益率 ROE</div>
+            </div>
+            <div class="dupont__factors">
+              <div class="dupont__factor"><b id="factor-margin">10.0%</b><span>净利率</span></div>
+              <div class="dupont__factor"><b id="factor-turn">1.20</b><span>周转率</span></div>
+              <div class="dupont__factor"><b id="factor-mult">1.60</b><span>权益乘数</span></div>
+            </div>
+          </div>
+
+          <div class="fragility">
+            <div class="fragility__head">
+              <span>组合脆弱度</span>
+              <b id="fragility-label">稳健</b>
+            </div>
+            <div class="fragility__track">
+              <div class="fragility__bar" id="fragility-bar"></div>
+            </div>
+          </div>
+
+          <div class="dupont__hint" id="dupont-hint"></div>
+        </div>
+
+        <p style="margin-top: var(--space-4); color: var(--ink-500); font-size: 0.92rem;">
+          现实中的 ROE 大多在 5%–30% 之间。如果拖出来的数字特别高，
+          先别激动，回去检查是净利率不真实、周转率算错，还是杠杆太高。
+        </p>
+      </section>
+
+      <!-- 三条红线 -->
+      <section class="section" id="redlines">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">财务造假的三条红线</h2>
+
+        <p>
+          指标是拿来验证商业逻辑的，不是拿来背的。当几个数字之间「对不上」时，
+          往往就是问题开始的地方。下面三条，是最值得警惕的信号。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">红线一：存贷双高</div>
+            <p style="margin-bottom:0;">
+              账上趴着大量现金，却同时借了大量高息负债。
+              这在商业上不合逻辑：如果现金是真的、又能自由使用，为什么要一边吃低利息、一边付高利息？
+              最常见的原因是——<strong>账上的现金是假的，或者被占用、受限，根本动不了</strong>。
+            </p>
+            <div class="concept__analogy">
+              就像一个朋友说自己存款百万，却天天找你借高利贷。你要先怀疑那百万存款是不是真的。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">红线二：应收和存货增速长期高于收入</div>
+            <p style="margin-bottom:0;">
+              收入涨 10%，应收账款涨 50%，存货涨 60%。这说明卖出去的东西，
+              要么钱收不回来，要么货只是从工厂搬到了仓库和经销商那里。
+              为了做出漂亮的收入，公司可能放宽信用、压货，甚至虚构交易。
+            </p>
+            <div class="concept__analogy">
+              就像餐厅说今天生意特别好，但一半客人是赊账、后厨还堆着三天的食材。热闹是假的，现金也是假的。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">红线三：经营现金流长期低于净利润</div>
+            <p style="margin-bottom:0;">
+              偶尔一年低于净利润很正常（比如年底集中备货）。
+              但如果连续三年以上，经营现金流都只有净利润的一半甚至更少，
+              说明利润长期没有变成钱。赚的是「纸面利润」，不是真金白银。
+            </p>
+            <div class="concept__analogy">
+              像一个人年年被评为优秀员工，但工资卡里的钱一直没增加。要么奖金是画饼，要么钱去了别的地方。
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-4);">
+          这三条红线的共同点，是「报表内部对不上」。造假可以改动一个数字，
+          但很难让所有数字同时自洽。所以看财报不要只盯一个指标，要做交叉验证：
+          <strong>利润和现金对、收入和应收对、资产和负债对</strong>。
+          对不上的地方，往往就是故事开始的地方。
+        </p>
+
+        <div class="card card--gold" style="margin-top: var(--space-5);">
+          <div class="card__title">看三年，看同行，看现金流</div>
+          <p style="margin-bottom:0;">
+            单个指标说明不了什么，三个动作最有效：
+            <strong>拉三年数据看趋势</strong>（一年可以修饰，三年很难）、
+            <strong>和同行业比</strong>（不同商业模式不可直接比）、
+            <strong>把利润和现金流对一遍</strong>（这是最难长期造假的地方）。
+          </p>
+        </div>
+      </section>
+
+      <!-- 误区 -->
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">ROE 越高越好</div>
+            <div class="myth__right">
+              先拆来源。靠高杠杆堆出来的 ROE 很脆弱：利率上行、收入下滑，
+              利润会被利息和亏损双重放大。稳定、低杠杆的 15%，可能比借来的 30% 更值钱。
+            </div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">毛利率高就是好公司</div>
+            <div class="myth__right">
+              高毛利可能来自会计口径、一次性收入，或者把成本挪到了别的科目。
+              还要看净利率、周转率和现金流，确认这个毛利能不能持续、能不能变成钱。
+            </div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">周转率越快越好</div>
+            <div class="myth__right">
+              周转率要和商业模式匹配。过快可能是靠大幅降价换来的，
+              也可能是过度压榨供应商。要看它有没有牺牲毛利和长期关系。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <!-- 术语卡 -->
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">毛利率<span class="glossary__en">Gross Margin</span></div>
+            <div class="glossary__def">（收入 − 成本）÷ 收入，衡量产品本身的赚钱能力。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">净利率<span class="glossary__en">Net Margin</span></div>
+            <div class="glossary__def">净利润 ÷ 收入，扣完所有费用和税后剩下的比例。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">ROE<span class="glossary__en">Return on Equity</span></div>
+            <div class="glossary__def">净利润 ÷ 所有者权益，股东每一块钱本金的回报率。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">ROA<span class="glossary__en">Return on Assets</span></div>
+            <div class="glossary__def">净利润 ÷ 总资产，全部资产的赚钱效率，不受负债影响。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">总资产周转率<span class="glossary__en">Asset Turnover</span></div>
+            <div class="glossary__def">收入 ÷ 总资产，一块钱资产一年能做多少生意。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">权益乘数<span class="glossary__en">Equity Multiplier</span></div>
+            <div class="glossary__def">总资产 ÷ 所有者权益，杠杆倍数，越大负债越高。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">资产负债率<span class="glossary__en">Debt Ratio</span></div>
+            <div class="glossary__def">总负债 ÷ 总资产，家当里有多少是借来的。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">杜邦分析<span class="glossary__en">DuPont Analysis</span></div>
+            <div class="glossary__def">把 ROE 拆成净利率、周转率、权益乘数三个因子。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 下一章 -->
+      <section class="section">
+        <a class="next-chapter" href="../16-valuation/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 16 章</div>
+            <div class="next-chapter__title">估值：贵还是便宜</div>
+          </div>
+          <span class="next-chapter__link">去第 16 章 →</span>
+        </a>
+      </section>
+
+      <!-- 完成 -->
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 杜邦调节器 ---------- */
+    const marginInput = document.getElementById('sl-margin');
+    const turnInput = document.getElementById('sl-turn');
+    const multInput = document.getElementById('sl-mult');
+
+    const marginOut = document.getElementById('out-margin');
+    const turnOut = document.getElementById('out-turn');
+    const multOut = document.getElementById('out-mult');
+
+    const roeValue = document.getElementById('roe-value');
+    const factorMargin = document.getElementById('factor-margin');
+    const factorTurn = document.getElementById('factor-turn');
+    const factorMult = document.getElementById('factor-mult');
+
+    const fragilityBar = document.getElementById('fragility-bar');
+    const fragilityLabel = document.getElementById('fragility-label');
+    const dupontHint = document.getElementById('dupont-hint');
+    const presetButtons = document.querySelectorAll('.preset-btn');
+
+    const PRESETS = {
+      luxury: { margin: 30, turn: 0.5, mult: 1.2 },
+      retail: { margin: 2.5, turn: 3, mult: 1.8 },
+      leveraged: { margin: 5, turn: 0.6, mult: 5 },
+      balanced: { margin: 10, turn: 1.2, mult: 1.6 }
+    };
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function updateDupont() {
+      const margin = parseFloat(marginInput.value) / 100;
+      const turn = parseFloat(turnInput.value);
+      const mult = parseFloat(multInput.value);
+      const roe = margin * turn * mult * 100;
+
+      marginOut.textContent = (margin * 100).toFixed(1) + '%';
+      turnOut.textContent = turn.toFixed(2);
+      multOut.textContent = mult.toFixed(2);
+
+      roeValue.textContent = roe.toFixed(1) + '%';
+      factorMargin.textContent = (margin * 100).toFixed(1) + '%';
+      factorTurn.textContent = turn.toFixed(2);
+      factorMult.textContent = mult.toFixed(2);
+
+      /* 脆弱度：杠杆权重最高，其次是净利率，最后是周转 */
+      const leverageRisk = clamp((mult - 2) / 4, 0, 1);
+      const marginRisk = clamp((10 - margin * 100) / 10, 0, 1);
+      const turnoverRisk = clamp((1.2 - turn) / 1.2, 0, 1);
+      const fragility = Math.round((0.55 * leverageRisk + 0.30 * marginRisk + 0.15 * turnoverRisk) * 100);
+
+      fragilityBar.style.width = fragility + '%';
+      fragilityBar.className = 'fragility__bar';
+      if (fragility >= 60) fragilityBar.classList.add('is-danger');
+      else if (fragility >= 30) fragilityBar.classList.add('is-warn');
+
+      fragilityLabel.textContent = fragility >= 60 ? '脆弱' : (fragility >= 30 ? '需留意' : '稳健');
+
+      let hintClass = '';
+      let hintTitle = '相对均衡的组合';
+      let hintText = '没有明显短板，也没有特别突出的优势。ROE 主要靠正常的利润和效率撑起来，杠杆不高，抗风险能力较好。';
+
+      if (mult >= 4 && margin * 100 <= 6) {
+        hintClass = 'is-danger';
+        hintTitle = '最脆弱的组合：薄利 + 高杠杆';
+        hintText = '利润本来就薄，杠杆又把波动放大。收入稍微下滑，利润可能直接归零，但利息和本金一分不能少。很多突然倒下的公司，都是这个组合。';
+      } else if (mult >= 3.5) {
+        hintClass = 'is-danger';
+        hintTitle = '高杠杆驱动：ROE 是借出来的';
+        hintText = 'ROE 里很大一部分来自权益乘数。生意好时放大收益，利率上行或资产贬值时也会放大亏损。要重点看负债成本、到期结构和现金流。';
+      } else if (margin * 100 >= 20 && turn <= 0.6) {
+        hintClass = '';
+        hintTitle = '高毛利、低周转：精品店模式';
+        hintText = '靠品牌或壁垒赚取高毛利，资产周转慢。抗价格战能力较强，但需求下滑时固定成本压力大。要盯住毛利率能不能守住。';
+      } else if (turn >= 2 && margin * 100 <= 5) {
+        hintClass = 'is-warn';
+        hintTitle = '薄利多销：超市模式';
+        hintText = '每一块钱收入只赚几分，靠高周转把总量做起来。最怕价格战和需求突然消失，规模一旦下滑，利润会掉得很快。';
+      } else if (fragility >= 60) {
+        hintClass = 'is-danger';
+        hintTitle = '需要警惕的组合';
+        hintText = '至少有一个因子明显偏弱。建议回到三张报表，确认利润是否有现金支撑、负债是否集中到期。';
+      } else if (fragility >= 30) {
+        hintClass = 'is-warn';
+        hintTitle = '有一定杠杆，需要留意';
+        hintText = '当前组合还能运转，但安全垫不算厚。如果行业进入下行周期，优先检查利息覆盖倍数和短期债务。';
+      }
+
+      dupontHint.className = 'dupont__hint' + (hintClass ? ' ' + hintClass : '');
+      const sensitivity = ((margin * 100 - 2) / 100) * turn * mult * 100;
+      dupontHint.innerHTML = '<strong>' + hintTitle + '</strong>' + hintText +
+        '<br><br><span style="color:var(--ink-500);font-size:.9rem;">敏感性：如果净利率再降 2 个百分点，ROE 会变成 ' +
+        sensitivity.toFixed(1) + '%。</span>';
+    }
+
+    function clearPresetActive() {
+      presetButtons.forEach((b) => b.classList.remove('is-active'));
+    }
+
+    [marginInput, turnInput, multInput].forEach((input) => {
+      input.addEventListener('input', () => {
+        clearPresetActive();
+        updateDupont();
+      });
+    });
+
+    presetButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const preset = PRESETS[btn.dataset.preset];
+        marginInput.value = preset.margin;
+        turnInput.value = preset.turn;
+        multInput.value = preset.mult;
+        clearPresetActive();
+        btn.classList.add('is-active');
+        updateDupont();
+      });
+    });
+
+    updateDupont();
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '杜邦分析把 ROE 拆成了哪三个因子？',
+        options: [
+          '毛利率 × 净利率 × 税率',
+          '净利率 × 总资产周转率 × 权益乘数',
+          '收入 × 成本 × 费用',
+          'ROA × 资产负债率 × 流动比率'
+        ],
+        answer: 1,
+        explain: 'ROE = 净利润/收入 × 收入/总资产 × 总资产/权益，中间两项约掉后正好等于净利润/权益。'
+      },
+      {
+        question: '一家公司的权益乘数是 4，说明什么？',
+        options: [
+          '公司有四倍的利润',
+          '总资产是净资产的 4 倍，资产负债率约为 75%',
+          '公司借了 4 倍的钱去分红',
+          '净资产是总资产的 4 倍'
+        ],
+        answer: 1,
+        explain: '权益乘数 = 总资产/权益 = 4，意味着每 4 元资产里有 1 元是股东的，3 元是借的，负债率 75%。'
+      },
+      {
+        question: '下面哪种组合的 ROE 最脆弱？',
+        options: [
+          '净利率 30%、周转 0.5、乘数 1.2',
+          '净利率 10%、周转 1.2、乘数 1.5',
+          '净利率 3%、周转 0.5、乘数 5',
+          '净利率 2.5%、周转 3、乘数 1.8'
+        ],
+        answer: 2,
+        explain: '薄利加高杠杆最危险：利润经不起波动，杠杆又把亏损同样放大，利息和本金却不会减少。'
+      },
+      {
+        question: '「存贷双高」为什么值得警惕？',
+        options: [
+          '因为公司太赚钱了',
+          '账上有很多现金却同时借高息债，不符合商业逻辑，现金可能不真实或受限',
+          '因为存款利率太低',
+          '因为公司没有负债'
+        ],
+        answer: 1,
+        explain: '真有可自由使用的现金，就没必要一边吃低息一边付高息。这是财务造假最常见的信号之一。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch15');
+  </script>
+</body>
+</html>

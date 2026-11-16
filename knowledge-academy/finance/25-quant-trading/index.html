@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 25 章 · 量化交易入门 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    .bt {
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+      margin: var(--space-5) 0;
+    }
+    .bt__controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-4);
+      align-items: end;
+      margin-bottom: var(--space-4);
+    }
+    .bt__field { display: flex; flex-direction: column; gap: var(--space-2); }
+    .bt__field label { font-size: 14px; font-weight: 650; color: var(--ink-700); }
+    .bt__field input[type="range"] { width: 100%; accent-color: var(--gold-500); }
+    .bt__num {
+      font-size: 1.1rem;
+      font-weight: 750;
+      color: var(--ink-900);
+      font-variant-numeric: tabular-nums;
+    }
+    .bt__num small { font-size: 13px; font-weight: 500; color: var(--ink-300); }
+    .bt__fixed {
+      padding: 10px 12px;
+      background: var(--bg-soft);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      color: var(--ink-500);
+    }
+    .bt__fixed b { color: var(--ink-900); }
+
+    .bt__stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .bt__stat {
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-soft);
+      border-radius: var(--radius-md);
+    }
+    .bt__stat span { display: block; font-size: 12px; color: var(--ink-300); margin-bottom: 2px; }
+    .bt__stat b {
+      font-size: 1.25rem;
+      color: var(--ink-900);
+      font-variant-numeric: tabular-nums;
+    }
+    .bt__stat b.is-up { color: var(--success-600); }
+    .bt__stat b.is-down { color: var(--danger-600); }
+
+    .chart-wrap {
+      background: #fff;
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin-top: var(--space-4);
+      overflow-x: auto;
+    }
+    .chart-wrap svg { display: block; width: 100%; height: auto; min-width: 560px; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      font-size: 12px;
+      color: var(--ink-500);
+      padding: var(--space-2) var(--space-3) 0;
+    }
+    .legend i {
+      display: inline-block;
+      width: 18px;
+      height: 2.5px;
+      border-radius: 2px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .legend .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .bt__note { font-size: 13px; color: var(--ink-300); margin-top: var(--space-3); }
+
+    .trap {
+      display: grid;
+      gap: var(--space-3);
+    }
+    .trap__item {
+      padding: var(--space-4) var(--space-5);
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-left: 4px solid var(--danger-600);
+      border-radius: var(--radius-md);
+    }
+    .trap__item strong { display: block; margin-bottom: var(--space-2); color: var(--ink-900); }
+    .trap__item p { margin-bottom: 0; font-size: 0.95rem; color: var(--ink-500); }
+
+    @media (max-width: 560px) {
+      .bt__stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：一条完美的回测曲线</a>
+        <a class="sidebar__link" href="#what-is-quant">量化交易是什么，不是什么</a>
+        <a class="sidebar__link" href="#factors">因子投资：量化的配料表</a>
+        <a class="sidebar__link" href="#strategy">双均线策略：最简单的趋势跟踪</a>
+        <a class="sidebar__link" href="#backtest">动手跑一次回测</a>
+        <a class="sidebar__link" href="#traps">回测的五个陷阱</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块七 · 金融科技</div>
+        <h1 class="hero__title">量化交易入门</h1>
+        <p class="hero__lead">
+          量化不是「用 AI 预测明天涨跌」，而是把一个投资想法写成明确的规则，
+          然后用历史数据检验它到底行不行。这一章你会亲手跑一个双均线回测，
+          并看到手续费和回测陷阱如何把漂亮曲线打回原形。
+        </p>
+      </header>
+
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>说清量化交易的三个环节，以及它和主观交易的本质区别</span></li>
+          <li><span class="goal-list__check">2</span><span>理解双均线策略的信号逻辑，并能解释它为什么在震荡市里会反复亏损</span></li>
+          <li><span class="goal-list__check">3</span><span>识别回测的五个典型陷阱：过拟合、幸存者偏差、未来函数、交易成本、样本外失效</span></li>
+        </ul>
+      </section>
+
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">一条完美的回测曲线</h2>
+
+        <div class="story">
+          <div class="story__label">回测 vs 实盘</div>
+          <p>
+            小周是个数据分析师，业余研究股票。他写了一个双均线策略：5 日均线上穿 20 日均线就买入，
+            下穿就卖出。用过去十年的数据一跑，<strong>年化收益 28%，最大回撤只有 12%</strong>。
+          </p>
+          <p>
+            他觉得自己找到了圣杯。又花了两个星期微调参数，把 5/20 改成 4/18，收益提高到 34%。
+            然后把积蓄投了进去。
+          </p>
+          <p>
+            实盘三个月，亏了 15%。更让他难受的是：同一段时间，策略的信号频繁出错，
+            买在高点、卖在低点，光手续费就吃掉了一万多。
+          </p>
+          <div class="story__question">
+            是策略失效了，还是这条「完美曲线」从一开始就有问题？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          答案通常是后者。回测里藏着几个几乎所有人都会踩的坑：
+          <strong>参数是在同一段历史上挑出来的、成交价用了当天收盘后才知道的信息、没有计入手续费和滑点、股票池只选了现在还活着的公司。</strong>
+          把这些修正之后，28% 的年化可能只剩下个位数，甚至跑不赢指数。
+        </p>
+      </section>
+
+      <section class="section" id="what-is-quant">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">量化交易是什么，不是什么</h2>
+
+        <p>
+          量化交易（Quantitative Trading）的核心不是「更聪明的预测」，而是<strong>把决策过程规则化、可回测、可复现</strong>。
+          一个完整的量化策略通常包含三个环节：
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 信号生成：什么时候买、什么时候卖</div>
+            <p style="margin-bottom:0;">
+              信号来自某个可计算的规则：均线交叉、估值分位、动量排名、财务指标筛选。
+              规则必须是<strong>明确的、无歧义的</strong>——「感觉要涨」不是信号，「5 日均线上穿 20 日均线」才是。
+            </p>
+            <div class="concept__analogy">
+              像菜谱：盐少许不是量化，「盐 3 克」才是。量化就是把「少许」变成可执行的数字。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 组合构建：买多少、买几只</div>
+            <p style="margin-bottom:0;">
+              信号告诉你「买什么」，组合构建决定「每只买多少」。常见方法有等权、市值加权、
+              波动率倒数加权等，还要考虑行业分散和单票上限。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 执行与风控：怎么买、什么时候停</div>
+            <p style="margin-bottom:0;">
+              包括下单方式（市价还是限价）、交易成本控制、止损、最大回撤限制、仓位上限。
+              <strong>很多策略不是输在信号，而是输在执行成本和风险控制。</strong>
+            </p>
+          </div>
+        </div>
+
+        <div class="card card--gold" style="margin-top: var(--space-5);">
+          <div class="card__title">量化 vs 主观：不是谁更聪明</div>
+          <p style="margin-bottom:0;">
+            主观交易靠研究员的判断、经验和信息；量化靠规则、数据和统计检验。
+            量化的优势是<strong>可以大规模、低成本地验证想法，并且不受情绪影响</strong>；
+            劣势是<strong>只能捕捉能被数据描述的东西</strong>，对突发事件、政策转向的反应往往滞后。
+            两者不是替代关系，很多机构是并行的。
+          </p>
+        </div>
+      </section>
+
+      <section class="section" id="factors">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">因子投资：量化选股的「配料表」</h2>
+
+        <p>
+          因子（Factor）是能够<strong>长期、稳定地解释一部分股票收益差异</strong>的特征。
+          学术界和业界总结出了几类经典因子，它们不是魔法公式，而是对某种风险或行为偏差的定价。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">价值因子（Value）</div>
+            <p style="margin-bottom:0;">
+              买相对便宜的股票：低市盈率（PE）、低市净率（PB）、高股息率。
+              逻辑是「便宜的东西长期会回归」。缺点是价值股可能长期不被市场喜欢，
+              而且「便宜」有时是因为基本面真的在恶化（价值陷阱）。
+            </p>
+            <div class="concept__analogy">
+              像逛折扣店：大部分折扣是真便宜，但也有一部分是临期商品。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">动量因子（Momentum）</div>
+            <p style="margin-bottom:0;">
+              买过去一段时间涨得好的股票，卖跌得差的。逻辑是趋势会延续，
+              背后有投资者反应不足和资金流向的原因。缺点是动量会突然反转，
+              在市场拐点处回撤很大。
+            </p>
+            <div class="concept__analogy">
+              像冲浪：顺着浪头走通常省力，但浪结束时要及时下来。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">质量因子（Quality）</div>
+            <p style="margin-bottom:0;">
+              买盈利能力高、负债低、现金流稳定的公司：高 ROE、低资产负债率、稳定的毛利率。
+              逻辑是好公司长期更能创造价值。缺点是优质公司通常不便宜。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">低波因子（Low Volatility）</div>
+            <p style="margin-bottom:0;">
+              买波动率低的股票。反直觉的是，低波股票长期风险调整后收益往往不差——
+              因为投资者喜欢追逐高波动的「彩票型」股票，导致低波股票被低估。
+            </p>
+            <div class="concept__analogy">
+              像买保险：大家愿意为刺激和可能性付溢价，稳稳当当的东西反而被冷落。
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          单因子很容易失效，所以实务中通常把多个因子组合起来，并做行业中性、市值中性处理，
+          避免策略实际上只是在押注某个行业。更重要的是：<strong>因子会拥挤。</strong>
+          当太多钱涌向同一个因子，它的超额收益就会被抹平。
+        </p>
+      </section>
+
+      <section class="section" id="strategy">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">双均线策略：最简单的趋势跟踪</h2>
+
+        <p>
+          双均线是最经典的入门策略。它只用两个数字：<strong>短期均线</strong>和<strong>长期均线</strong>。
+        </p>
+
+        <ul>
+          <li><strong>5 日均线（MA5）</strong>：过去 5 天收盘价的平均，反应快，像「最近的情绪」。</li>
+          <li><strong>20 日均线（MA20）</strong>：过去 20 天的平均，反应慢，像「一个月的趋势」。</li>
+        </ul>
+
+        <div class="card">
+          <div class="card__title">交易规则</div>
+          <p style="margin-bottom:0;">
+            <strong>金叉买入：</strong>MA5 从下方穿过 MA20，说明短期价格开始强于中期趋势。<br>
+            <strong>死叉卖出：</strong>MA5 从上方跌破 MA20，说明短期走弱。<br>
+            其余时间空仓或持仓不动。<strong>不做预测，只跟随。</strong>
+          </p>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          它的优点是不猜顶底、规则简单、容易执行；缺点也很明显：
+        </p>
+        <ul>
+          <li><strong>震荡市反复打脸。</strong>价格在均线附近来回穿，会产生一连串小亏（whipsaw）。</li>
+          <li><strong>信号滞后。</strong>均线是平均出来的，等金叉出现，价格往往已经涨了一段。</li>
+          <li><strong>参数敏感。</strong>5/20 只是习惯用法，换成 4/18 结果可能天差地别——这本身就是过拟合的信号。</li>
+          <li><strong>成本吞噬。</strong>频繁交易时，手续费和滑点会显著拉低收益。</li>
+        </ul>
+
+        <div class="card card--info">
+          <div class="card__title">一个重要的认知</div>
+          <p style="margin-bottom:0;">
+            双均线不是「稳赚策略」，它只是一个用来<strong>演示量化流程</strong>的最小例子。
+            真实策略要考虑股票池、仓位、止损、交易成本、容量，复杂度高得多。
+            但这个例子里暴露的问题，和复杂策略是完全一样的。
+          </p>
+        </div>
+      </section>
+
+      <section class="section" id="backtest">
+        <div class="section__label">动手跑一次</div>
+        <h2 class="section__title">双均线回测：信号、成本与净值</h2>
+
+        <p>
+          下面用一段<strong>预置的模拟行情</strong>（160 个交易日）跑双均线策略。
+          初始资金 1 万元，金叉全仓买入、死叉全部卖出，买卖各收一次手续费。
+          拖动手续费，观察收益如何变化。
+        </p>
+
+        <div class="bt">
+          <div class="bt__controls">
+            <div class="bt__field">
+              <label for="fee">单边手续费率</label>
+              <input type="range" id="fee" min="0" max="0.5" step="0.01" value="0.1">
+              <div class="bt__num"><span id="fee-val">0.10</span> <small>% / 每次买卖</small></div>
+            </div>
+            <div class="bt__field">
+              <label>策略参数</label>
+              <div class="bt__fixed">快线 <b>MA5</b> · 慢线 <b>MA20</b>（固定）</div>
+            </div>
+            <div class="bt__field">
+              <label>初始资金</label>
+              <div class="bt__fixed"><b>10,000</b> 元</div>
+            </div>
+          </div>
+
+          <div class="bt__stats">
+            <div class="bt__stat">
+              <span>策略收益</span>
+              <b id="stat-strategy">—</b>
+            </div>
+            <div class="bt__stat">
+              <span>买入持有收益</span>
+              <b id="stat-hold">—</b>
+            </div>
+            <div class="bt__stat">
+              <span>买卖信号次数</span>
+              <b id="stat-trades">—</b>
+            </div>
+            <div class="bt__stat">
+              <span>最大回撤</span>
+              <b id="stat-drawdown">—</b>
+            </div>
+            <div class="bt__stat">
+              <span>累计交易成本</span>
+              <b id="stat-cost">—</b>
+            </div>
+          </div>
+
+          <div class="chart-wrap">
+            <div class="legend">
+              <span><i style="background:var(--ink-300);"></i>收盘价</span>
+              <span><i style="background:var(--gold-500);"></i>MA5</span>
+              <span><i style="background:var(--info-600);"></i>MA20</span>
+              <span><span class="dot" style="background:var(--success-600);"></span>买入信号</span>
+              <span><span class="dot" style="background:var(--danger-600);"></span>卖出信号</span>
+            </div>
+            <svg id="price-chart" viewBox="0 0 760 320" role="img" aria-label="价格走势与均线信号图"></svg>
+          </div>
+
+          <div class="chart-wrap">
+            <div class="legend">
+              <span><i style="background:var(--gold-500);"></i>策略净值</span>
+              <span><i style="background:var(--ink-300);"></i>买入持有净值</span>
+            </div>
+            <svg id="equity-chart" viewBox="0 0 760 200" role="img" aria-label="策略净值与买入持有净值对比图"></svg>
+          </div>
+
+          <p class="bt__note" id="bt-note"></p>
+        </div>
+
+        <p>
+          建议做两次对比：先把手续费拖到 <strong>0</strong>，看「理论上」的收益；
+          再拖到 <strong>0.3%</strong>，看成本如何吃掉利润。如果策略交易频繁，
+          这个差距会非常刺眼——这正是很多人回测和实盘对不上的原因之一。
+        </p>
+      </section>
+
+      <section class="section" id="traps">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">回测的五个陷阱</h2>
+
+        <p>
+          回测的第一原则是：<strong>回测是检验想法的最低门槛，不是收益承诺。</strong>
+          下面五个坑，任何一个都足以让一条漂亮曲线变得毫无意义。
+        </p>
+
+        <div class="trap">
+          <div class="trap__item">
+            <strong>① 过拟合：把参数调到历史最优</strong>
+            <p>
+              在同一段历史上反复试参数，总能找到一组「看起来最好」的。但它拟合的是历史的噪声，
+              不是未来的规律。判断方法：看参数附近是否稳定——如果 5/20 赚钱、6/21 就亏钱，
+              说明策略靠的是巧合，不是逻辑。
+            </p>
+          </div>
+          <div class="trap__item">
+            <strong>② 幸存者偏差：只测现在还活着的股票</strong>
+            <p>
+              用今天的股票池回测十年前，等于提前知道了哪些公司没有退市。
+              那些破产、被并购、被剔除的股票不在样本里，收益自然被高估。
+              正确做法是使用<strong>当时可得的成分股列表</strong>，包括后来消失的公司。
+            </p>
+          </div>
+          <div class="trap__item">
+            <strong>③ 未来函数：用了当天还不知道的信息</strong>
+            <p>
+              最典型的是「用当天收盘价计算均线，又用当天收盘价成交」。
+              收盘价要收盘后才知道，你不可能在同一时刻既看到信号又完成交易。
+              更隐蔽的还有用财报发布前的数据、用后来修订过的宏观数据。
+              <strong>任何决策只能使用决策时点之前可得的信息。</strong>
+            </p>
+          </div>
+          <div class="trap__item">
+            <strong>④ 交易成本：手续费、印花税、滑点</strong>
+            <p>
+              回测里常常假设「想买就按收盘价买到」。现实中大单会推动价格，
+              流动性差的股票滑点更大。再加上佣金、印花税，高频策略的成本可能吃掉大部分超额收益。
+              上面的回测工具就是让你亲手感受这件事。
+            </p>
+          </div>
+          <div class="trap__item">
+            <strong>⑤ 样本外失效：训练集好，测试集崩</strong>
+            <p>
+              正确流程是：用一段数据开发策略（样本内），用另一段没碰过的数据验证（样本外）。
+              如果样本外表现大幅下滑，说明策略没有泛化能力。
+              更严格的做法是滚动向前验证（walk-forward），模拟「每次只用当时已知的数据重新训练」。
+            </p>
+          </div>
+        </div>
+
+        <div class="card card--gold" style="margin-top: var(--space-5);">
+          <div class="card__title">一个简单的自检清单</div>
+          <p style="margin-bottom:0;">
+            看到一条漂亮回测，先问五个问题：<strong>参数是怎么选的？股票池包含退市股吗？
+            信号和成交用的是同一时点的数据吗？成本算了吗？样本外测过吗？</strong>
+            五个问题里有两个答不上来，这条曲线就只能当参考，不能当依据。
+          </p>
+        </div>
+      </section>
+
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">回测收益高，实盘就能赚钱</div>
+            <div class="myth__right">回测只说明「在这段历史上，按这些假设，规则能跑通」。成本、滑点、容量和样本外表现都可能让它失效。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">参数调得越细、因子越多，策略越强</div>
+            <div class="myth__right">参数越多越容易过拟合。好的策略通常逻辑简单、参数稳定，在样本外也能站得住。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">量化是印钞机，找到公式就能稳定赚钱</div>
+            <div class="myth__right">因子会拥挤、市场结构会变、成本会侵蚀收益。量化是提高决策纪律的工具，不是消除风险的魔法。</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">因子<span class="glossary__en">Factor</span></div>
+            <div class="glossary__def">能长期解释一部分收益差异的可量化特征，如价值、动量、质量、低波。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">均线<span class="glossary__en">Moving Average</span></div>
+            <div class="glossary__def">过去 N 个交易日收盘价的平均值，用来平滑短期波动、观察趋势。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">金叉 / 死叉</div>
+            <div class="glossary__def">短期均线上穿长期均线为金叉（买入信号），下穿为死叉（卖出信号）。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">回测<span class="glossary__en">Backtest</span></div>
+            <div class="glossary__def">用历史数据模拟策略的交易过程，检验其收益与风险特征。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">过拟合<span class="glossary__en">Overfitting</span></div>
+            <div class="glossary__def">策略过度适应历史噪声，在样本外数据上表现大幅下滑。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">幸存者偏差<span class="glossary__en">Survivorship Bias</span></div>
+            <div class="glossary__def">只使用当前仍存在的样本，忽略已退市或失败的样本，导致结果高估。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">未来函数<span class="glossary__en">Look-ahead Bias</span></div>
+            <div class="glossary__def">在决策时使用了当时还无法获得的信息，使回测结果虚高。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">滑点<span class="glossary__en">Slippage</span></div>
+            <div class="glossary__def">预期成交价与实际成交价之间的差异，流动性越差越明显。</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <a class="next-chapter" href="../index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">课程结束</div>
+            <div class="next-chapter__title">回到课程目录</div>
+          </div>
+          <span class="next-chapter__link">回到目录 →</span>
+        </a>
+      </section>
+
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 预置行情序列（固定种子，可复现） ---------- */
+    function buildPrices() {
+      let seed = 20240917;
+      const rand = () => {
+        seed = (seed * 1103515245 + 12345) % 2147483648;
+        return seed / 2147483648;
+      };
+      const prices = [];
+      let p = 100;
+      for (let i = 0; i < 160; i++) {
+        const cycle = Math.sin(i / 5) * 0.02;
+        const shock = (rand() - 0.5) * 0.04;
+        p = p * (1 + cycle + shock);
+        p = Math.max(20, Math.min(300, p));
+        prices.push(Math.round(p * 100) / 100);
+      }
+      return prices;
+    }
+
+    const PRICES = buildPrices();
+    const INITIAL = 10000;
+    const FAST = 5;
+    const SLOW = 20;
+
+    function movingAverage(arr, n) {
+      const out = new Array(arr.length).fill(null);
+      let sum = 0;
+      for (let i = 0; i < arr.length; i++) {
+        sum += arr[i];
+        if (i >= n) sum -= arr[i - n];
+        if (i >= n - 1) out[i] = sum / n;
+      }
+      return out;
+    }
+
+    const MA_FAST = movingAverage(PRICES, FAST);
+    const MA_SLOW = movingAverage(PRICES, SLOW);
+
+    /* ---------- 回测 ---------- */
+    function runBacktest(feeRate) {
+      const fee = feeRate / 100;
+      let cash = INITIAL;
+      let shares = 0;
+      let holding = false;
+      let totalCost = 0;
+      const equity = [];
+      const trades = [];
+
+      for (let i = 0; i < PRICES.length; i++) {
+        const price = PRICES[i];
+        const prevFast = i > 0 ? MA_FAST[i - 1] : null;
+        const prevSlow = i > 0 ? MA_SLOW[i - 1] : null;
+        const fast = MA_FAST[i];
+        const slow = MA_SLOW[i];
+
+        let signal = null;
+        if (prevFast !== null && prevSlow !== null && fast !== null && slow !== null) {
+          if (prevFast <= prevSlow && fast > slow) signal = 'buy';
+          else if (prevFast >= prevSlow && fast < slow) signal = 'sell';
+        }
+
+        if (signal === 'buy' && !holding) {
+          const cost = cash * fee;
+          totalCost += cost;
+          shares = (cash - cost) / price;
+          cash = 0;
+          holding = true;
+          trades.push({ i, type: 'buy', price });
+        } else if (signal === 'sell' && holding) {
+          const gross = shares * price;
+          const cost = gross * fee;
+          totalCost += cost;
+          cash = gross - cost;
+          shares = 0;
+          holding = false;
+          trades.push({ i, type: 'sell', price });
+        }
+
+        equity.push(cash + shares * price);
+      }
+
+      const finalEquity = equity[equity.length - 1];
+      const strategyReturn = finalEquity / INITIAL - 1;
+
+      const holdShares = INITIAL / PRICES[0];
+      const holdFinal = holdShares * PRICES[PRICES.length - 1];
+      const holdReturn = holdFinal / INITIAL - 1;
+
+      let peak = equity[0];
+      let maxDrawdown = 0;
+      equity.forEach((v) => {
+        if (v > peak) peak = v;
+        const dd = 1 - v / peak;
+        if (dd > maxDrawdown) maxDrawdown = dd;
+      });
+
+      return {
+        equity,
+        trades,
+        totalCost,
+        strategyReturn,
+        holdReturn,
+        holdEquity: PRICES.map((p) => holdShares * p),
+        maxDrawdown,
+        finalEquity
+      };
+    }
+
+    /* ---------- SVG 绘图 ---------- */
+    function linePath(values, x, y, from) {
+      const pts = [];
+      for (let i = from; i < values.length; i++) {
+        if (values[i] === null) continue;
+        pts.push(`${x(i).toFixed(2)},${y(values[i]).toFixed(2)}`);
+      }
+      return pts.join(' ');
+    }
+
+    function drawPriceChart(trades) {
+      const W = 760;
+      const H = 320;
+      const padL = 48;
+      const padR = 14;
+      const padT = 16;
+      const padB = 28;
+
+      let min = Math.min(...PRICES);
+      let max = Math.max(...PRICES);
+      MA_FAST.forEach((v) => { if (v !== null) { min = Math.min(min, v); max = Math.max(max, v); } });
+      MA_SLOW.forEach((v) => { if (v !== null) { min = Math.min(min, v); max = Math.max(max, v); } });
+      const span = max - min || 1;
+      min -= span * 0.08;
+      max += span * 0.08;
+
+      const x = (i) => padL + (i / (PRICES.length - 1)) * (W - padL - padR);
+      const y = (v) => padT + ((max - v) / (max - min)) * (H - padT - padB);
+
+      let svg = '';
+      /* 网格与 y 轴刻度 */
+      for (let g = 0; g <= 4; g++) {
+        const val = min + ((max - min) / 4) * g;
+        const yy = y(val);
+        svg += `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W - padR}" y2="${yy.toFixed(1)}" stroke="#e2e8f0" stroke-width="1"/>`;
+        svg += `<text x="${padL - 8}" y="${(yy + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="#94a3b8">${val.toFixed(1)}</text>`;
+      }
+      /* 日期轴标签 */
+      [0, 39, 79, 119, 159].forEach((i) => {
+        if (i < PRICES.length) {
+          svg += `<text x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#94a3b8">第 ${i + 1} 天</text>`;
+        }
+      });
+
+      /* 价格与均线 */
+      svg += `<polyline points="${linePath(PRICES, x, y, 0)}" fill="none" stroke="#94a3b8" stroke-width="1.4" opacity="0.75"/>`;
+      svg += `<polyline points="${linePath(MA_FAST, x, y, FAST - 1)}" fill="none" stroke="#d97706" stroke-width="1.8"/>`;
+      svg += `<polyline points="${linePath(MA_SLOW, x, y, SLOW - 1)}" fill="none" stroke="#1d4ed8" stroke-width="1.8"/>`;
+
+      /* 交易信号 */
+      trades.forEach((t) => {
+        const px = x(t.i);
+        const py = y(t.price);
+        if (t.type === 'buy') {
+          svg += `<polygon points="${px},${py + 16} ${px - 6},${py + 27} ${px + 6},${py + 27}" fill="#15803d" stroke="#fff" stroke-width="1.2"><title>买入 · 第 ${t.i + 1} 天 · ${t.price.toFixed(2)} 元</title></polygon>`;
+        } else {
+          svg += `<polygon points="${px},${py - 16} ${px - 6},${py - 27} ${px + 6},${py - 27}" fill="#b91c1c" stroke="#fff" stroke-width="1.2"><title>卖出 · 第 ${t.i + 1} 天 · ${t.price.toFixed(2)} 元</title></polygon>`;
+        }
+      });
+
+      document.getElementById('price-chart').innerHTML = svg;
+    }
+
+    function drawEquityChart(result) {
+      const W = 760;
+      const H = 200;
+      const padL = 48;
+      const padR = 14;
+      const padT = 16;
+      const padB = 26;
+
+      const all = result.equity.concat(result.holdEquity);
+      let min = Math.min(...all);
+      let max = Math.max(...all);
+      const span = max - min || 1;
+      min -= span * 0.08;
+      max += span * 0.08;
+
+      const x = (i) => padL + (i / (PRICES.length - 1)) * (W - padL - padR);
+      const y = (v) => padT + ((max - v) / (max - min)) * (H - padT - padB);
+
+      let svg = '';
+      for (let g = 0; g <= 3; g++) {
+        const val = min + ((max - min) / 3) * g;
+        const yy = y(val);
+        svg += `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W - padR}" y2="${yy.toFixed(1)}" stroke="#e2e8f0" stroke-width="1"/>`;
+        svg += `<text x="${padL - 8}" y="${(yy + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="#94a3b8">${Math.round(val)}</text>`;
+      }
+      svg += `<polyline points="${linePath(result.holdEquity, x, y, 0)}" fill="none" stroke="#94a3b8" stroke-width="1.6" opacity="0.8"/>`;
+      svg += `<polyline points="${linePath(result.equity, x, y, 0)}" fill="none" stroke="#d97706" stroke-width="2"/>`;
+      document.getElementById('equity-chart').innerHTML = svg;
+    }
+
+    /* ---------- 渲染 ---------- */
+    function fmtPercent(v) {
+      return (v * 100).toFixed(1) + '%';
+    }
+
+    function render() {
+      const feeRate = Number(document.getElementById('fee').value);
+      document.getElementById('fee-val').textContent = feeRate.toFixed(2);
+
+      const result = runBacktest(feeRate);
+      drawPriceChart(result.trades);
+      drawEquityChart(result);
+
+      const s = document.getElementById('stat-strategy');
+      s.textContent = (result.strategyReturn >= 0 ? '+' : '') + fmtPercent(result.strategyReturn);
+      s.className = result.strategyReturn >= 0 ? 'is-up' : 'is-down';
+
+      const h = document.getElementById('stat-hold');
+      h.textContent = (result.holdReturn >= 0 ? '+' : '') + fmtPercent(result.holdReturn);
+      h.className = result.holdReturn >= 0 ? 'is-up' : 'is-down';
+
+      document.getElementById('stat-trades').textContent = result.trades.length + ' 次';
+      document.getElementById('stat-drawdown').textContent = fmtPercent(result.maxDrawdown);
+      document.getElementById('stat-cost').textContent = '¥' + Math.round(result.totalCost).toLocaleString('zh-CN');
+
+      const diff = result.strategyReturn - result.holdReturn;
+      let note = `期末资产 ¥${Math.round(result.finalEquity).toLocaleString('zh-CN')}。`;
+      if (feeRate === 0) {
+        note += ' 当前手续费为 0，这是「理论上」的收益。试着调到 0.3%，看成本吃掉多少。';
+      } else if (diff > 0) {
+        note += ' 这个样本里策略跑赢了买入持有，但请注意：这是同一段数据上的单次结果，不代表未来。';
+      } else {
+        note += ' 这个样本里策略跑输了买入持有。趋势策略在震荡行情中会被反复打脸，交易越频繁，成本越高。';
+      }
+      document.getElementById('bt-note').textContent = note;
+    }
+
+    document.getElementById('fee').addEventListener('input', render);
+    render();
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '双均线策略中「金叉」指的是？',
+        options: [
+          '短期均线上穿长期均线',
+          '短期均线下穿长期均线',
+          '两条均线重合',
+          '价格突破历史最高点'
+        ],
+        answer: 0,
+        explain: '金叉是短期均线从下方穿过长期均线，通常被视为趋势转强的买入信号；反之为死叉。'
+      },
+      {
+        question: '用「当天收盘价计算均线，再用当天收盘价成交」，这属于哪种回测错误？',
+        options: [
+          '幸存者偏差',
+          '未来函数',
+          '过拟合',
+          '滑点'
+        ],
+        answer: 1,
+        explain: '收盘价要收盘后才知道，无法在同一时点既看到信号又完成交易，这是典型的未来函数。'
+      },
+      {
+        question: '只用今天仍然上市的股票回测十年前，最可能导致？',
+        options: [
+          '收益被低估',
+          '收益被高估，因为退市和失败的公司不在样本里',
+          '交易成本被高估',
+          '没有任何影响'
+        ],
+        answer: 1,
+        explain: '这就是幸存者偏差。样本只保留了「活下来的人」，自然看起来更成功。'
+      },
+      {
+        question: '关于双均线策略，下面哪个说法最准确？',
+        options: [
+          '只要参数选对，就能稳定盈利',
+          '它是一种趋势跟踪方法，在震荡市会反复产生亏损信号',
+          '它没有任何交易成本',
+          '它能提前预测市场顶部'
+        ],
+        answer: 1,
+        explain: '双均线跟随趋势，不预测顶底。震荡市中均线反复交叉，会产生连续的小额亏损和交易成本。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch25');
+  </script>
+</body>
+</html>

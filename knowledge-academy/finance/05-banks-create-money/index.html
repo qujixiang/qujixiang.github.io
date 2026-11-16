@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 5 章 · 银行如何创造货币 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    /* 货币派生模拟器 */
+    .sim {
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sim__controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-5);
+      margin-bottom: var(--space-5);
+    }
+
+    .sim__control-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink-700);
+      margin-bottom: var(--space-2);
+    }
+
+    .sim__control-value {
+      color: var(--gold-600);
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .sim input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold-500);
+      cursor: pointer;
+    }
+
+    .sim__stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: var(--space-3);
+    }
+
+    .sim__stat {
+      background: var(--bg-soft);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      text-align: center;
+    }
+
+    .sim__stat-label {
+      font-size: 12px;
+      color: var(--ink-500);
+      margin-bottom: var(--space-1);
+    }
+
+    .sim__stat-value {
+      font-size: 1.35rem;
+      font-weight: 750;
+      color: var(--ink-900);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.3;
+    }
+
+    .sim__chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 190px;
+      margin-top: var(--space-5);
+      padding-top: var(--space-4);
+      border-top: 1px dashed var(--ink-100);
+    }
+
+    .sim__col {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .sim__col-track {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .sim__col-fill {
+      width: 100%;
+      background: var(--gold-100);
+      border-radius: 3px 3px 0 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+      min-height: 2px;
+      transition: height .18s ease;
+    }
+
+    .sim__col-new {
+      width: 100%;
+      background: var(--gold-500);
+    }
+
+    .sim__col-label {
+      font-size: 10px;
+      color: var(--ink-300);
+      padding-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sim__legend {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--ink-500);
+      margin-top: var(--space-3);
+    }
+
+    .sim__legend span::before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 6px;
+      vertical-align: -1px;
+      background: var(--gold-100);
+    }
+
+    .sim__legend span.is-new::before { background: var(--gold-500); }
+
+    .sim__note {
+      margin: var(--space-4) 0 0;
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-soft);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--ink-500);
+      line-height: 1.7;
+    }
+
+    .ledger {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+
+    .ledger__col {
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .ledger__head {
+      background: var(--ink-900);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .ledger__row {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      font-size: 14px;
+      border-top: 1px solid var(--ink-100);
+    }
+
+    .ledger__row strong { font-variant-numeric: tabular-nums; }
+
+    @media (max-width: 560px) {
+      .ledger { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <!-- 侧边目录 -->
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：金匠铺的收据</a>
+        <a class="sidebar__link" href="#creation">一笔贷款，一笔存款</a>
+        <a class="sidebar__link" href="#reserve">准备金率与乘数</a>
+        <a class="sidebar__link" href="#simulator">动手：100 元变多少</a>
+        <a class="sidebar__link" href="#profit">银行靠什么赚钱</a>
+        <a class="sidebar__link" href="#run">挤兑与期限错配</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块二 · 金融系统</div>
+        <h1 class="hero__title">银行如何创造货币</h1>
+        <p class="hero__lead">
+          你可能以为，银行是把张三存的钱借给李四。真相更奇妙：银行在放贷的那一刻，凭空创造出了一笔新的存款。
+        </p>
+      </header>
+
+      <!-- 本章目标 -->
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>复述「存款 → 贷款 → 派生存款」的完整链条</span></li>
+          <li><span class="goal-list__check">2</span><span>用准备金率估算货币乘数，并知道它为什么只是上限</span></li>
+          <li><span class="goal-list__check">3</span><span>说清银行的三类收入，以及挤兑为什么发生</span></li>
+        </ul>
+      </section>
+
+      <!-- 开场故事 -->
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">金匠铺的收据</h2>
+
+        <div class="story">
+          <div class="story__label">历史场景 · 17 世纪伦敦</div>
+          <p>
+            那时候还没有今天这样的银行。有钱人把金币存进金匠铺，金匠开一张收据，写明「凭此据可取回多少金币」。
+          </p>
+          <p>
+            金匠很快发现两件事：第一，大家不会同一天来取金币；第二，市面上很多人愿意直接收这张收据，
+            因为它比背着一袋金币安全。
+          </p>
+          <p>
+            于是金匠开始把「暂时用不到」的金币借出去，收利息。借出去的金币转一圈，又被存回另一家金匠铺，
+            又开出一张收据……到最后，金匠干脆发现：<strong>根本不需要先有金币，只要开一张收据借给别人，别人也认。</strong>
+          </p>
+          <div class="story__question">
+            金匠并没有多挖出一枚金币，为什么市面上的「钱」变多了？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          因为「钱」不只是金币本身，还包括那些被普遍接受的「欠条」。金匠的收据能随时换回金币，
+          所以它和金币一样能买东西。现代银行继承的正是这套机制，只是<strong>收据变成了账户余额，金匠铺变成了银行</strong>。
+        </p>
+      </section>
+
+      <!-- 核心概念一 -->
+      <section class="section" id="creation">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">一笔贷款，同时创造一笔存款</h2>
+
+        <p>
+          先记住一句话：<strong>银行发放贷款，不是在搬运存款，而是在记账。</strong>
+          你存进去的 100 元，并不会被打包送给借款人；借款人的账户里，是银行新记上去的一笔数字。
+        </p>
+
+        <div class="card card--gold">
+          <div class="card__title">把 100 元存进银行，接下来发生什么</div>
+          <p>
+            <strong>第 1 步：</strong>你把 100 元现金存进 A 银行。A 银行的资产端多了 100 元现金，
+            负债端多了「欠你 100 元」的存款。此时市场上的钱没有变多，只是从你口袋换了个地方。
+          </p>
+          <p>
+            <strong>第 2 步：</strong>假设准备金率是 10%。A 银行留下 10 元，把剩下的 90 元贷给小李。
+            放贷时，A 银行同时记两笔账：资产端多了一笔「小李欠我 90 元」的贷款，
+            负债端多了一笔「小李的存款 90 元」。
+          </p>
+          <p>
+            <strong>第 3 步：</strong>小李拿这 90 元付货款，收款人把这笔钱存进 B 银行。
+            B 银行留下 9 元，再贷出 81 元……
+          </p>
+          <p style="margin-bottom:0;">
+            <strong>第 4 步：</strong>100 + 90 + 81 + 72.9 + … 一直加下去，
+            在准备金率 10% 的假设下，存款总额会逼近 <strong>1000 元</strong>。
+            初始的 100 元，被放大成了 10 倍。
+          </p>
+        </div>
+
+        <div class="ledger">
+          <div class="ledger__col">
+            <div class="ledger__head">A 银行 · 资产（钱去哪了）</div>
+            <div class="ledger__row"><span>准备金（存在央行）</span><strong>10 元</strong></div>
+            <div class="ledger__row"><span>贷给小李的贷款</span><strong>90 元</strong></div>
+            <div class="ledger__row"><span>合计</span><strong>100 元</strong></div>
+          </div>
+          <div class="ledger__col">
+            <div class="ledger__head">A 银行 · 负债（钱是谁的）</div>
+            <div class="ledger__row"><span>你的存款</span><strong>100 元</strong></div>
+            <div class="ledger__row"><span>合计</span><strong>100 元</strong></div>
+          </div>
+        </div>
+
+        <p style="font-size: 13px; color: var(--ink-300); margin-top: calc(var(--space-2) * -1);">
+          注：小李拿到贷款后马上付了货款，这 90 元存款和对应的准备金转到了 B 银行，
+          所以 A 银行的负债端只剩下你的 100 元。放贷的一瞬间，A 银行的负债端曾同时有你的 100 元和小李的 90 元。
+        </p>
+
+        <p>
+          注意：你的 100 元仍然是你的，随时可以取；小李的 90 元则是被「创造」出来的。
+          银行并没有变魔术，它只是把「未来会还回来的钱」提前记成了今天的购买力，
+          同时承担了小李可能不还钱的风险。<strong>货币创造和信用风险，是同一枚硬币的两面。</strong>
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">为什么收款人存进 B 银行，钱还能继续变多？</div>
+            <p style="margin-bottom:0;">
+              因为每一轮贷款都会变成某人的收入，而收入又会被存起来。B 银行拿到 90 元后，
+              同样只留 9 元、贷出 81 元。只要银行愿意放贷、有人愿意借钱、收到钱的人又存回银行，
+              这个循环就会继续，只是每轮金额越来越小。
+            </p>
+            <div class="concept__analogy">
+              像往池塘里扔一块石头，涟漪一圈比一圈小，但水面确实被推开了很多圈。
+              初始存款是那块石头，准备金率决定每一圈衰减得多快。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">「派生存款」：钱不是被转移，而是被追加</div>
+            <p style="margin-bottom:0;">
+              教科书把 B 银行、C 银行……新收到的存款叫<strong>派生存款</strong>。
+              它和你最初存的那 100 元不是同一笔钱，而是由贷款创造出来的新存款。
+              整个过程里，现金可能只移动了一两次，但「可用于支付的余额」增加了很多。
+            </p>
+            <div class="concept__analogy">
+              像一个小区里每个人都给邻居写欠条，欠条可以当钱花。只要大家相信欠条能兑现，
+              小区里的「购买力」就比抽屉里的现金多得多。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--info" style="margin-top: var(--space-5);">
+          <div class="card__title">先分清：存款是银行的负债</div>
+          <p style="margin-bottom:0;">
+            你看到的是「我卡里有 100 元」，银行看到的是「我欠你 100 元」。
+            存款对你是资产，对银行是负债。理解这一点，后面的挤兑、存款保险、
+            银行资产负债表就都顺了。
+          </p>
+        </div>
+      </section>
+
+      <!-- 核心概念二 -->
+      <section class="section" id="reserve">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">准备金率：货币乘数的刹车</h2>
+
+        <p>
+          如果每一轮都只留 10%，100 元最终能变成 1000 元；如果只留 5%，能变成 2000 元；
+          如果留 20%，只能变成 500 元。<strong>准备金率越低，同样的初始存款能派生出的货币越多。</strong>
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">5%</div>
+            <div class="compare__label">乘数上限 20 倍<br>100 元 → 2000 元</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">10%</div>
+            <div class="compare__label">乘数上限 10 倍<br>100 元 → 1000 元</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">20%</div>
+            <div class="compare__label">乘数上限 5 倍<br>100 元 → 500 元</div>
+          </div>
+        </div>
+
+        <p>
+          这里的公式很简单：<strong>货币乘数上限 = 1 ÷ 准备金率</strong>。
+          准备金率 10%，上限就是 1 ÷ 0.1 = 10 倍。这个上限也叫「简单存款乘数」。
+        </p>
+
+        <p>
+          准备金分两种：<strong>法定准备金</strong>是央行强制要求、按存款一定比例存在央行的钱，不能动；
+          <strong>超额准备金</strong>是银行自愿多留的安全垫。银行真正能贷出去的，
+          是扣掉准备金之后的部分。
+        </p>
+
+        <div class="card">
+          <div class="card__title">为什么现实中达不到 10 倍？</div>
+          <p style="margin-bottom:0;">
+            因为钱会「漏」出去：有人把贷款取成现金放在家里，不再存回银行；
+            银行可能因为担心风险而多留超额准备金；企业可能根本不想借钱；
+            监管还会用资本充足率、流动性指标给银行加约束。
+            所以 <strong>1 ÷ 准备金率只是理论上限，不是承诺</strong>。
+            现实中的货币乘数，通常明显低于这个数。
+          </p>
+        </div>
+      </section>
+
+      <!-- 交互 -->
+      <section class="section" id="simulator">
+        <div class="section__label">动手试试</div>
+        <h2 class="section__title">100 元，能变出多少钱？</h2>
+
+        <p>
+          拖动下面两个滑块：一个是准备金率，一个是存款轮次。
+          看看 100 元初始存款，在不同条件下能派生到多少，离理论上限还有多远。
+        </p>
+
+        <div class="sim">
+          <div class="sim__controls">
+            <div>
+              <div class="sim__control-label">
+                <span>准备金率</span>
+                <span class="sim__control-value" id="rr-val">10%</span>
+              </div>
+              <input type="range" id="rr" min="5" max="20" step="1" value="10" aria-label="准备金率">
+            </div>
+            <div>
+              <div class="sim__control-label">
+                <span>存款轮次 N</span>
+                <span class="sim__control-value" id="rounds-val">5 轮</span>
+              </div>
+              <input type="range" id="rounds" min="1" max="20" step="1" value="5" aria-label="存款轮次">
+            </div>
+          </div>
+
+          <div class="sim__stats">
+            <div class="sim__stat">
+              <div class="sim__stat-label">初始存款</div>
+              <div class="sim__stat-value">¥100</div>
+            </div>
+            <div class="sim__stat">
+              <div class="sim__stat-label">N 轮后存款总额</div>
+              <div class="sim__stat-value" id="total">¥100</div>
+            </div>
+            <div class="sim__stat">
+              <div class="sim__stat-label">实际货币乘数</div>
+              <div class="sim__stat-value" id="multiplier">1.00 倍</div>
+            </div>
+            <div class="sim__stat">
+              <div class="sim__stat-label">理论上限（1/r）</div>
+              <div class="sim__stat-value" id="limit">10.0 倍</div>
+            </div>
+          </div>
+
+          <div class="sim__chart" id="chart" aria-label="每轮存款累计图"></div>
+          <div class="sim__legend">
+            <span>此前累计存款</span>
+            <span class="is-new">本轮新增存款</span>
+          </div>
+
+          <p class="sim__note" id="sim-note"></p>
+        </div>
+
+        <p style="margin-top: var(--space-4);">
+          多试几组数字，你会发现两个规律：第一，准备金率越低，最终总额越接近上限；
+          第二，轮次越多，越接近上限，但永远只是「接近」——因为每一轮新增的金额都在按比例缩小。
+        </p>
+      </section>
+
+      <!-- 核心概念三 -->
+      <section class="section" id="profit">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">银行靠什么赚钱</h2>
+
+        <p>
+          既然存款是负债、贷款是资产，银行最传统的生意就是「低息借进来、高息贷出去」。
+          但现代银行的收入早就不止这一种。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 存贷利差</div>
+            <p style="margin-bottom:0;">
+              银行以较低的利率吸收存款，以较高的利率发放贷款，赚中间的差价。
+              比如存款平均付 1.5%，贷款平均收 4.5%，中间 3 个百分点就是毛利。
+              但这 3 个点要覆盖坏账、人工、网点、系统成本，剩下的才是利润。
+            </p>
+            <div class="concept__analogy">
+              像批发商：低价进货、高价卖出。区别是银行卖的是「钱的使用权」，
+              而且进货（存款）和出货（贷款）的期限常常对不上。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 中间业务（手续费）</div>
+            <p style="margin-bottom:0;">
+              支付结算、银行卡、代销基金和保险、托管、理财、投行承销……
+              这些业务不动用银行自己的资金，主要靠牌照、渠道和专业能力收服务费。
+              好处是收入稳定、不直接承担信用风险，也不那么消耗资本。
+            </p>
+            <div class="concept__analogy">
+              像商场收租金和通道费，而不是自己囤货赚差价。货卖得好不好，
+              商场都能收到一部分服务费。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 投资收益与交易</div>
+            <p style="margin-bottom:0;">
+              银行会把一部分资金配置到债券、同业资产等，赚利息和价差。
+              这块收入对市场利率和资产价格很敏感，行情好时贡献大，行情差时也可能亏钱。
+            </p>
+            <div class="concept__analogy">
+              像一个手里有闲钱的家庭，会买点理财和债券。收益比活期高，
+              但不是随时都能无损变现。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--info" style="margin-top: var(--space-5);">
+          <div class="card__title">为什么利率市场化后，银行都在谈「转型」</div>
+          <p style="margin-bottom:0;">
+            利差被竞争压窄，靠规模吃利差越来越难，银行就更重视中间业务。
+            这也解释了一个现象：你办卡、买理财、买保险时，客户经理总是很热情——
+            这些业务不占用银行的资本金，手续费却是实打实的收入。
+          </p>
+        </div>
+      </section>
+
+      <!-- 核心概念四 -->
+      <section class="section" id="run">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">挤兑：银行最怕的不是坏账，是同时取钱</h2>
+
+        <p>
+          银行有一个天生的结构性问题：<strong>存款是短的，贷款是长的</strong>。
+          你的活期存款随时能取，但银行贷出去的钱，可能三五年才收得回来。
+          这叫<strong>期限错配</strong>。
+        </p>
+
+        <p>
+          只要大家不同时来取钱，这个结构就能运转：每天有人存、有人取，银行留一部分准备金就够了。
+          可一旦信心崩塌——哪怕银行本来资产质量没问题——所有人都会想「趁它还有钱，我先取」。
+          这就是<strong>挤兑</strong>。
+        </p>
+
+        <div class="story">
+          <div class="story__label">真实案例 · 2007 年英国北岩银行</div>
+          <p>
+            北岩银行当时是一家不小的房贷银行。它不像传统银行那样主要靠储户存款，
+            而是大量依赖短期批发市场借钱，再放长期房贷。
+          </p>
+          <p>
+            2007 年次贷危机爆发，短期融资市场突然不肯借钱给它。消息传开后，
+            储户在网点门口排起长队，几天内被取走约 20 亿英镑。
+            英国政府最终出面担保存款，才止住了挤兑。
+          </p>
+          <p style="margin-bottom:0;">
+            北岩的问题，不是「没有资产」，而是「资产变不成现金」。
+            <strong>流动性危机可以在几天内击倒一家原本资可抵债的银行。</strong>
+          </p>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          这也解释了为什么现代金融体系需要三样东西：<strong>存款保险</strong>（让小额储户不必抢着跑）、
+          <strong>央行最后贷款人</strong>（在流动性枯竭时提供应急资金）、以及<strong>监管</strong>
+          （限制银行承担过多风险）。这三样我们会在第 8 章详细讲。
+        </p>
+      </section>
+
+      <!-- 误区 -->
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">银行只是把储户的钱借给借款人</div>
+            <div class="myth__right">
+              现代银行发放贷款时，会同时创造一笔新的存款。存款不是从一个账户搬到另一个账户，
+              而是被「追加」出来的，所以银行是货币创造者，不只是资金中介。
+            </div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">银行可以凭空无限印钱</div>
+            <div class="myth__right">
+              货币创造受准备金率、资本充足率、流动性要求、信贷需求和监管约束。
+              乘数有上限，银行也不能想贷多少就贷多少。
+            </div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">存款是银行自己的钱，银行想怎么用就怎么用</div>
+            <div class="myth__right">
+              存款是银行的负债，是它欠储户的钱。银行可以用一部分去放贷，
+              但必须保留准备金，并接受期限错配带来的流动性风险约束。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <!-- 术语卡 -->
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">部分准备金制度<span class="glossary__en">Fractional Reserve Banking</span></div>
+            <div class="glossary__def">银行只保留一部分存款作为准备金，其余用于放贷的制度。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">准备金率<span class="glossary__en">Reserve Ratio</span></div>
+            <div class="glossary__def">存款中必须留存、不能放贷的比例，是货币乘数的刹车。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">货币乘数<span class="glossary__en">Money Multiplier</span></div>
+            <div class="glossary__def">基础货币经过银行体系派生出的广义货币倍数，简单模型下上限约为 1 ÷ 准备金率。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">派生存款<span class="glossary__en">Derived Deposit</span></div>
+            <div class="glossary__def">由银行贷款创造出来的新存款，不是原有存款的转移。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">基础货币<span class="glossary__en">Base Money</span></div>
+            <div class="glossary__def">流通中的现金加上银行在央行的准备金存款，也叫高能货币。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">期限错配<span class="glossary__en">Maturity Mismatch</span></div>
+            <div class="glossary__def">用短期负债支持长期资产，是银行流动性的根源性风险。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">挤兑<span class="glossary__en">Bank Run</span></div>
+            <div class="glossary__def">大量储户同时取款，导致银行被迫贱卖资产甚至倒闭。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">净利差<span class="glossary__en">Net Interest Spread</span></div>
+            <div class="glossary__def">生息资产收益率与计息负债成本率之间的差额。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 下一章 -->
+      <section class="section">
+        <a class="next-chapter" href="../06-central-bank/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 6 章</div>
+            <div class="next-chapter__title">央行与货币政策：降准降息到底在干什么</div>
+          </div>
+          <span class="next-chapter__link">继续学习 →</span>
+        </a>
+      </section>
+
+      <!-- 完成 -->
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 货币派生模拟 ---------- */
+    const BASE = 100;
+    const rrInput = document.getElementById('rr');
+    const roundsInput = document.getElementById('rounds');
+    const rrVal = document.getElementById('rr-val');
+    const roundsVal = document.getElementById('rounds-val');
+    const totalEl = document.getElementById('total');
+    const multiplierEl = document.getElementById('multiplier');
+    const limitEl = document.getElementById('limit');
+    const chartEl = document.getElementById('chart');
+    const noteEl = document.getElementById('sim-note');
+
+    function renderSim() {
+      const rate = Number(rrInput.value) / 100;
+      const rounds = Number(roundsInput.value);
+      const limit = BASE / rate;
+
+      let total = BASE;
+      const rows = [{ round: 1, added: BASE, total: BASE }];
+      for (let i = 2; i <= rounds; i += 1) {
+        const added = BASE * Math.pow(1 - rate, i - 1);
+        total += added;
+        rows.push({ round: i, added: added, total: total });
+      }
+
+      rrVal.textContent = Math.round(rate * 100) + '%';
+      roundsVal.textContent = rounds + ' 轮';
+      totalEl.textContent = '¥' + total.toFixed(0);
+      multiplierEl.textContent = (total / BASE).toFixed(2) + ' 倍';
+      limitEl.textContent = (1 / rate).toFixed(1) + ' 倍';
+
+      chartEl.innerHTML = rows.map((row) => {
+        const height = Math.min(100, (row.total / limit) * 100);
+        const newShare = row.total > 0 ? (row.added / row.total) * 100 : 0;
+        return `
+          <div class="sim__col" title="第 ${row.round} 轮：新增 ¥${row.added.toFixed(1)}，累计 ¥${row.total.toFixed(1)}">
+            <div class="sim__col-track">
+              <div class="sim__col-fill" style="height:${height.toFixed(1)}%">
+                <div class="sim__col-new" style="height:${newShare.toFixed(1)}%"></div>
+              </div>
+            </div>
+            <div class="sim__col-label">${row.round}</div>
+          </div>
+        `;
+      }).join('');
+
+      const firstLoan = BASE * (1 - rate);
+      noteEl.textContent =
+        '准备金率 ' + Math.round(rate * 100) + '%：第 1 轮银行留下 ¥' + (BASE * rate).toFixed(0) +
+        ' 准备金，贷出 ¥' + firstLoan.toFixed(0) + '；这笔钱被存入下一家银行后，又只留下其中的 ' +
+        Math.round(rate * 100) + '%…… 经过 ' + rounds + ' 轮，存款总额 ¥' + total.toFixed(0) +
+        '，货币乘数 ' + (total / BASE).toFixed(2) + ' 倍。理论上限是 1 ÷ ' +
+        Math.round(rate * 100) + '% = ' + (1 / rate).toFixed(1) + ' 倍（¥' + limit.toFixed(0) +
+        '）；现实中还有现金漏损和信贷需求不足，通常达不到。';
+    }
+
+    rrInput.addEventListener('input', renderSim);
+    roundsInput.addEventListener('input', renderSim);
+    renderSim();
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '你把 100 元存进银行，准备金率 10%。第一轮银行最多能贷出多少？',
+        options: ['100 元', '90 元', '10 元', '81 元'],
+        answer: 1,
+        explain: '银行留下 10 元准备金，剩下的 90 元才能贷出去。81 元是第二轮的数字。'
+      },
+      {
+        question: '准备金率是 5% 时，简单货币乘数的理论上限是多少？',
+        options: ['5 倍', '10 倍', '20 倍', '100 倍'],
+        answer: 2,
+        explain: '乘数上限 = 1 ÷ 准备金率 = 1 ÷ 0.05 = 20 倍。'
+      },
+      {
+        question: '银行发放一笔贷款时，资产负债表上同时发生了什么？',
+        options: [
+          '资产端贷款增加，负债端存款增加',
+          '资产端现金减少，负债端存款减少',
+          '只增加资产，不增加负债',
+          '只增加负债，不增加资产'
+        ],
+        answer: 0,
+        explain: '贷款是银行的资产，借款人账户里的存款是银行的负债。两笔同时记，所以叫「创造存款」。'
+      },
+      {
+        question: '为什么一家资产质量尚可的银行，也可能因为挤兑而倒闭？',
+        options: [
+          '因为它的贷款利率太低',
+          '因为存款是短期的、贷款是长期的，同时取款会迫使它贱卖资产',
+          '因为央行不允许它放贷',
+          '因为储户取钱会直接让银行破产清算'
+        ],
+        answer: 1,
+        explain: '期限错配导致流动性危机。资产本身有价值，但短期变不成现金，挤兑就会自我实现。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch05');
+  </script>
+</body>
+</html>

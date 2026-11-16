@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 0 章 · 不懂金融，会吃什么亏 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    .data-table { width: 100%; border-collapse: collapse; margin: var(--space-4) 0; font-size: .95rem; }
+    .data-table th, .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--ink-100); text-align: right; }
+    .data-table th:first-child, .data-table td:first-child { text-align: left; }
+    .data-table thead th { color: var(--ink-500); font-weight: 600; font-size: 13px; border-bottom: 2px solid var(--ink-100); }
+    .data-table td { font-variant-numeric: tabular-nums; }
+    .data-table .is-highlight { color: var(--gold-600); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <!-- 侧边目录 -->
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：18% 的保本理财</a>
+        <a class="sidebar__link" href="#what">金融在解决什么问题</a>
+        <a class="sidebar__link" href="#costs">不懂金融的三笔学费</a>
+        <a class="sidebar__link" href="#returns">收益到底从哪来</a>
+        <a class="sidebar__link" href="#system">一张图看懂金融系统</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">导学 · 为什么学金融</div>
+        <h1 class="hero__title">不懂金融，会吃什么亏</h1>
+        <p class="hero__lead">
+          金融不是炒股。它决定了你的工资怎么花、存款怎么缩水、风险什么时候会落到你头上。
+        </p>
+      </header>
+
+      <!-- 本章目标 -->
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>说出不懂金融最常见的三种代价，并知道它们分别从哪里来</span></li>
+          <li><span class="goal-list__check">2</span><span>用「时间、风险、信息」三个维度，拆解任何一笔收益的来源</span></li>
+          <li><span class="goal-list__check">3</span><span>理解这套课的学习路径，知道每一章要解决什么问题</span></li>
+        </ul>
+      </section>
+
+      <!-- 开场故事 -->
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">18% 的保本理财</h2>
+
+        <div class="story">
+          <div class="story__label">真实场景改编 · 2014 年</div>
+          <p>
+            老陈在一家事业单位做后勤，攒了 30 万。2014 年，同事拉他进了一个理财群，
+            群里的产品写着：<strong>「年化 18%，保本保息，随存随取」</strong>。
+          </p>
+          <p>
+            他一开始也犹豫。但前三个月，利息真的按时到账，一分不少。他试着取了一次，也顺利到账。
+            于是他把 30 万全部投了进去，还拉着爱人又加了 10 万。
+          </p>
+          <p>
+            第八个月，平台公告「系统升级，暂停提现」。第十一个月，公司人去楼空。
+            老陈后来跟人说：<strong>「18% 也不算高啊，股票一天就能涨 10%。」</strong>
+          </p>
+          <div class="story__question">
+            问题不在于 18% 这个数字。问题在于：他从来没有问过，这 18% 到底是谁付给他的？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          当时银行一年期定存利率大约 3%。有人愿意用 18% 向你借钱，只有三种可能：
+          他承担了你没看见的风险；他有你不知道的信息；或者，他压根没打算还。
+          <strong>收益不会凭空产生，它一定有来源。</strong>看不懂来源，就只能看到数字。
+        </p>
+      </section>
+
+      <!-- 金融解决什么问题 -->
+      <section class="section" id="what">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">金融在解决什么问题</h2>
+
+        <p>
+          抛开那些复杂的名词，金融从头到尾只做一件事：<strong>让钱在时间和风险上流动起来</strong>。
+          钱停在原地，只是纸；流动起来，才能变成厂房、工资、房子和养老金。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 跨时间：把今天的钱搬到未来，或把未来的钱搬到今天</div>
+            <p style="margin-bottom:0;">
+              你 25 岁开始存养老金，是把今天的收入搬到 60 岁；你贷款买房，是把未来的收入搬到今天。
+              利息，就是这次「搬运」的价格。没有金融，你只能靠床底下的存钱罐，攒不出首付，也养不了老。
+            </p>
+            <div class="concept__analogy">
+              像一部时光电梯。它不能让你多赚钱，但能让钱在「现在」和「以后」之间移动。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 跨空间：把钱从「有闲钱的人」手里，送到「要用钱的人」手里</div>
+            <p style="margin-bottom:0;">
+              一边是千家万户的存款，一边是企业的厂房和设备。银行、股市、债市做的，就是把分散的小钱汇起来，
+              交给能用它创造更多价值的地方。企业赚了钱，再通过利息、分红、工资流回来。
+            </p>
+            <div class="concept__analogy">
+              像一套物流系统。物流把货从多的地方运到缺的地方，金融把钱从「暂时不用」运到「现在急用」。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 跨风险：把风险从「扛不住的人」身上，转移到「扛得住的人」身上</div>
+            <p style="margin-bottom:0;">
+              你怕生病花掉几十万，于是买医疗险；你怕原材料涨价，于是做套期保值。
+              保险和衍生品的本质，不是让你赚钱，而是<strong>把你不想要的不确定性卖给别人</strong>，
+              代价是一笔保费或一个差价。
+            </p>
+            <div class="concept__analogy">
+              像给房子装避雷针。它不改变天气，只是把雷引到不会着火的地方。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--gold" style="margin-top: var(--space-5);">
+          <div class="card__title">记住这句话</div>
+          <p style="margin-bottom:0;">
+            金融不创造「无中生有」的财富，它做的是<strong>时间和风险的重新分配</strong>。
+            所以任何一笔收益，都能追问：它补偿的是谁的时间？谁的风险？谁的信息？
+          </p>
+        </div>
+      </section>
+
+      <!-- 三笔学费 -->
+      <section class="section" id="costs">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">不懂金融的三笔学费</h2>
+
+        <p>
+          这三笔钱，大多数人交过，只是不知道自己在交。它们不会一次性扣走，
+          而是以「看不见」的方式，从你的账户里慢慢流失。
+        </p>
+
+        <h3 style="margin: var(--space-5) 0 var(--space-3);">第一笔：通胀税——存款在悄悄缩水</h3>
+        <p>
+          假设你有 10 万元，存一年期定存，利率 1.5%；同期物价上涨 3%。
+          一年后你拿到 10.15 万，但这 10.15 万只能买到相当于今天 9.85 万的东西。
+          <strong>数字变多了，购买力却少了。</strong>
+        </p>
+        <p>
+          这不是某一年的事。如果持续 10 年，按 1.5% 的存款利率和 3% 的通胀率计算，
+          10 万块的名义金额会变成约 11.6 万，但实际购买力只剩约 <strong>8.6 万</strong>。
+          你什么都没做错，只是把钱放在了原地。
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">10 万</div>
+            <div class="compare__label">今天的本金</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">11.6 万</div>
+            <div class="compare__label">10 年后的账面金额</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">8.6 万</div>
+            <div class="compare__label">10 年后的实际购买力</div>
+          </div>
+        </div>
+
+        <h3 style="margin: var(--space-5) 0 var(--space-3);">第二笔：风险错配——把不该冒险的钱拿去冒险</h3>
+        <p>
+          张女士计划明年给孩子交 20 万学费，看着基金涨得好，就把这笔钱买了股票型基金。
+          半年后市场回撤 25%，20 万变成 15 万，她不得不在最差的时点卖出，剩下的缺口只能借。
+        </p>
+        <p>
+          这笔亏损的根源，不是「股票不好」，而是<strong>钱的期限和资产的期限不匹配</strong>。
+          短期要用的钱，必须放在波动小、能随时取的地方；长期不用的钱，才有资格去承受波动。
+          这就是「风险错配」，也是普通人亏大钱最常见的方式之一。
+        </p>
+
+        <h3 style="margin: var(--space-5) 0 var(--space-3);">第三笔：条款信息差——看不懂，就按对方说的算</h3>
+        <p>
+          信用卡账单上写着「分期月手续费 0.6%」。很多人心里一算：0.6% × 12 = 7.2%，
+          好像还能接受。但手续费是按<strong>最初的本金</strong>收的，而你的欠款每个月都在减少。
+          用内部收益率算下来，真实年化成本大约在 <strong>13%</strong> 左右，接近账面数字的两倍。
+        </p>
+        <p>
+          类似的还有：五险一金按什么基数交、公积金能贷多少、医保哪些能报、
+          房贷选等额本息还是等额本金、保险是保障还是理财。这些条款都不难，
+          难的是没人主动给你讲清楚。<strong>看不懂的代价，就是按对方的口径付钱。</strong>
+        </p>
+
+        <p>
+          这三笔学费有一个共同点：<strong>它们都不是一次性的，而是会持续发生</strong>。
+          通胀每年收一次，风险错配可能一次性亏掉几年积蓄，条款信息差则会在每一次分期、
+          每一次贷款、每一次报销里悄悄扣钱。你不会收到账单，因为你根本不知道自己在付。
+          学金融的第一层价值，就是把这些隐形的账单显性化。
+        </p>
+
+        <div class="card card--info">
+          <div class="card__title">一个朴素的判断标准</div>
+          <p style="margin-bottom:0;">
+            凡是把「收益」说得很确定、把「风险」说得很模糊的产品，都要多问一句：
+            最坏的情况是什么？我能不能承受？如果对方回避这个问题，答案通常已经很清楚。
+          </p>
+        </div>
+      </section>
+
+      <!-- 收益来源 -->
+      <section class="section" id="returns">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">收益到底从哪来</h2>
+
+        <p>
+          这是整套课最重要的一把尺子。看到任何一个收益率，先别急着比较高低，
+          先问：<strong>这笔钱赚的是哪一份收益？</strong>
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 时间的钱：无风险利率</div>
+            <p style="margin-bottom:0;">
+              你把钱借给信用最好的主体（通常指国家），约定一段时间不用，对方给你一点补偿。
+              这就是国债收益率，也是整个金融市场的「地板价」。你几乎不承担违约风险，
+              所以也高不到哪里去。
+            </p>
+            <div class="concept__analogy">
+              像把车位租出去收的租金。车位还是你的，你只是让渡了一段时间的使用权。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 风险的钱：风险溢价</div>
+            <p style="margin-bottom:0;">
+              企业债比国债多给的利息、股票长期高于债券的回报、小公司比大公司更高的融资成本，
+              都是风险溢价。它不是白给的，是你有可能亏钱、有可能拿不到、有可能卖不掉的补偿。
+            </p>
+            <div class="concept__analogy">
+              像高空作业的补贴。多出来的钱不是因为你更厉害，而是因为你在承担掉下去的风险。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 信息的钱：认知与套利</div>
+            <p style="margin-bottom:0;">
+              有人比别人更早看懂一家公司、更快发现两个市场的价差，于是赚到超额收益。
+              这部分钱真实存在，但有两个特点：<strong>它属于少数人，而且会随着信息扩散迅速消失</strong>。
+              所以任何声称「稳定年化 20%」的产品，都不太可能靠这个持续赚钱。
+            </p>
+            <div class="concept__analogy">
+              像早市上第一个知道哪家批发价便宜的人。等所有人都知道了，差价就没了。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--gold" style="margin-top: var(--space-5);">
+          <div class="card__title">用这把尺子量一下老陈的产品</div>
+          <p style="margin-bottom:0;">
+            18% 的「保本保息」，赚的是时间的钱吗？不是，国债只有 3%。
+            赚的是风险的钱吗？可它说「保本」。赚的是信息的钱吗？可它说「谁都能买」。
+            <strong>三样都对不上，那这笔收益就只能来自后来者的本金——也就是庞氏结构。</strong>
+          </p>
+        </div>
+      </section>
+
+      <!-- 金融系统图 + 学习方法 -->
+      <section class="section" id="system">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">一张图看懂金融系统</h2>
+
+        <p>
+          后面 25 章会讲很多角色。先记住五个，以及它们之间的钱怎么流。
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">居民</div>
+            <div class="compare__label">钱的供给方<br>储蓄、投资、消费</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">企业</div>
+            <div class="compare__label">钱的需求方<br>融资、生产、分红</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">银行</div>
+            <div class="compare__label">间接融资<br>吸存放贷</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">市场</div>
+            <div class="compare__label">直接融资<br>股票、债券、基金</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">监管</div>
+            <div class="compare__label">定规则<br>防系统性风险</div>
+          </div>
+        </div>
+
+        <p>
+          把钱的流向连起来，是一条闭环：居民把闲钱存进银行，银行贷给企业；
+          居民也可以买基金，基金去股市、债市买企业发行的证券；企业拿到钱去生产，
+          赚了利润之后，一部分以工资发给居民，一部分以利息和分红还给资金提供方。
+          监管站在外圈，规定谁能做、能做多少、出了问题谁兜底。
+        </p>
+        <p>
+          这条链上任何一环出问题，都会传导到你的账户：企业还不上钱，银行不良上升；
+          银行挤兑，央行要放水；央行放水，你手里的钱可能变毛。
+          <strong>你以为离你很远的金融新闻，最后都会以某种方式落到你的工资、房价和存款上。</strong>
+        </p>
+
+        <p>
+          学完这套课，你不一定会变成一个会选股的人，但你应该能做到三件事：
+          看到一笔收益，能判断它大概来自哪里；拿到一份合同或账单，能找出关键条款；
+          面对涨跌和新闻，能分清哪些是噪音、哪些会影响你的钱。
+          <strong>这三件事不需要天赋，只需要一套稳定的判断框架。</strong>
+          后面的 25 章，就是把这套框架一块一块搭起来。
+        </p>
+
+        <div class="card">
+          <div class="card__title">这套课怎么学</div>
+          <p>
+            每章 20–30 分钟，结构固定：先用一个故事或反直觉的问题开场，再讲 2–4 个核心概念，
+            然后用生活类比帮你建立直觉，接着列出常见误区、做 4 道测验、最后给一张术语卡。
+          </p>
+          <p style="margin-bottom:0;">
+            建议按顺序学。第 1–4 章建立「钱、时间、风险、通胀」四个地基，
+            后面的银行、股票、债券、估值，都建在这四块砖上。
+            这套课<strong>不推荐任何具体产品，也不预测涨跌</strong>，只教你判断的方法。
+          </p>
+        </div>
+      </section>
+
+      <!-- 误区 -->
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">金融就是炒股</div>
+            <div class="myth__right">炒股只是二级市场的一小块。金融还包括储蓄、借贷、保险、支付、企业融资和风险管理，和每个人的日常都有关。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">我不理财，就没有风险</div>
+            <div class="myth__right">不理财也是一种选择，而且同样承担风险：现金每年被通胀收税，购买力几乎确定地下降。区别只是「主动承担」还是「被动承担」。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">收益率越高，说明这个人或平台越厉害</div>
+            <div class="myth__right">高收益通常对应高风险、信息优势或骗局。先问收益从哪来，再谈高低。对不上来源的收益，最贵。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <!-- 术语卡 -->
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">金融<span class="glossary__en">Finance</span></div>
+            <div class="glossary__def">让资金跨越时间和风险流动的一套安排，包括储蓄、借贷、投资、保险等。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">本金<span class="glossary__en">Principal</span></div>
+            <div class="glossary__def">最初投入或借出的那笔钱，利息通常以它为基数计算。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">收益率<span class="glossary__en">Return</span></div>
+            <div class="glossary__def">收益占本金的比例，通常按年化表示，方便不同期限之间比较。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">风险<span class="glossary__en">Risk</span></div>
+            <div class="glossary__def">结果的不确定性。既包括可能亏钱，也包括可能少赚。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">流动性<span class="glossary__en">Liquidity</span></div>
+            <div class="glossary__def">资产变成现金的速度，以及变现时是否需要折价。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">通货膨胀<span class="glossary__en">Inflation</span></div>
+            <div class="glossary__def">整体物价水平持续上涨，等价于货币购买力持续下降。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">风险溢价<span class="glossary__en">Risk Premium</span></div>
+            <div class="glossary__def">承担额外风险所要求的额外回报，是风险资产高于无风险利率的部分。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">风险错配<span class="glossary__en">Risk Mismatch</span></div>
+            <div class="glossary__def">资金的期限或风险承受能力，与所投资产不匹配，例如用短期要用的钱买高波动资产。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 下一章 -->
+      <section class="section">
+        <a class="next-chapter" href="../01-what-is-money/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 1 章</div>
+            <div class="next-chapter__title">钱是什么：从贝壳到余额数字</div>
+          </div>
+          <span class="next-chapter__link">继续学习 →</span>
+        </a>
+      </section>
+
+      <!-- 完成 -->
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '「年化 18%、保本保息」的产品，最核心的问题通常是什么？',
+        options: [
+          '18% 这个数字太高，超过 10% 就是骗局',
+          '它承诺的收益没有对应的风险、时间或信息来源',
+          '它没有在银行备案',
+          '它的期限太短'
+        ],
+        answer: 1,
+        explain: '判断收益先看来源。国债只有 3% 左右，它却承诺保本 18%，三样来源都对不上，剩下的可能就是用后来者的本金兑付。'
+      },
+      {
+        question: '金融最核心的功能是什么？',
+        options: [
+          '让钱生钱，创造额外财富',
+          '预测股票涨跌',
+          '让资金跨越时间和风险流动，提高配置效率',
+          '帮助政府收税'
+        ],
+        answer: 2,
+        explain: '金融不无中生有地创造财富，它做的是把资金从「暂时不用」配置到「现在需要」，并在过程中重新分配风险。'
+      },
+      {
+        question: '信用卡分期「月手续费 0.6%」，真实年化成本大约是多少？',
+        options: [
+          '7.2%',
+          '6%',
+          '13% 左右',
+          '0.6%'
+        ],
+        answer: 2,
+        explain: '手续费按最初本金收取，但你的欠款每月在减少，资金实际占用时间只有一半左右，所以真实年化约为账面数字的两倍。'
+      },
+      {
+        question: '「我不理财，所以没有风险」这句话错在哪里？',
+        options: [
+          '不理财会被收手续费',
+          '现金的购买力会被通胀持续侵蚀，这也是一种确定发生的风险',
+          '不理财就无法买房',
+          '银行存款不受法律保护'
+        ],
+        answer: 1,
+        explain: '不投资只是把风险换了一种形式：从「价格波动」换成「购买力确定下降」。风险不会因为不理会而消失。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch00');
+  </script>
+</body>
+</html>

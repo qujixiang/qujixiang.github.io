@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 19 章 · 行为金融学：为什么聪明人也会亏钱 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    .bias-test {
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+      margin: var(--space-5) 0;
+    }
+    .bias-test__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-3);
+    }
+    .bias-test__title { font-weight: 700; color: var(--ink-900); }
+    .bias-test__sub { font-size: 13px; color: var(--ink-300); margin-top: 2px; }
+    .bias-test__progress {
+      font-size: 13px;
+      color: var(--ink-500);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .bias-test__track {
+      height: 4px;
+      background: var(--ink-100);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: var(--space-5);
+    }
+    .bias-test__track-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--gold-500), var(--gold-300));
+      border-radius: 999px;
+      transition: width .3s ease;
+    }
+    .bias-test__question {
+      font-size: 1.05rem;
+      font-weight: 650;
+      color: var(--ink-900);
+      margin-bottom: var(--space-4);
+      line-height: 1.6;
+    }
+    .bias-test__options { display: grid; gap: var(--space-2); }
+    .bias-test__option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-card);
+      border: 1.5px solid var(--ink-100);
+      border-radius: var(--radius-md);
+      font: inherit;
+      font-size: 0.98rem;
+      color: var(--ink-700);
+      cursor: pointer;
+      transition: all .15s;
+      line-height: 1.6;
+    }
+    .bias-test__option:hover:not(:disabled) {
+      border-color: var(--gold-300);
+      background: #fffdf7;
+      transform: translateX(2px);
+    }
+    .bias-test__option.is-picked {
+      border-color: var(--gold-500);
+      background: var(--gold-100);
+      color: var(--gold-600);
+      font-weight: 600;
+    }
+    .bias-test__option:disabled { cursor: default; }
+
+    .bias-test__result { display: none; }
+    .bias-test__result.is-visible { display: block; }
+
+    .bias-result__title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink-900);
+      margin-bottom: var(--space-2);
+    }
+    .bias-result__lead {
+      font-size: 0.95rem;
+      color: var(--ink-500);
+      margin-bottom: var(--space-5);
+    }
+    .bias-row {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr) 44px;
+      gap: var(--space-3);
+      align-items: center;
+      margin-bottom: var(--space-3);
+    }
+    .bias-row__name { font-size: 13px; font-weight: 600; color: var(--ink-700); }
+    .bias-row__track {
+      height: 10px;
+      background: var(--bg-soft);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bias-row__fill {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      transition: width .5s ease;
+    }
+    .bias-row__count {
+      font-size: 13px;
+      color: var(--ink-500);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .bias-row.is-top .bias-row__name { color: var(--ink-900); }
+    .bias-row.is-top .bias-row__count { color: var(--ink-900); font-weight: 700; }
+
+    .bias-top {
+      margin-top: var(--space-5);
+      padding: var(--space-4) var(--space-5);
+      border: 1px solid var(--gold-300);
+      background: linear-gradient(180deg, #fffdf7, #fffaf0);
+      border-radius: var(--radius-md);
+    }
+    .bias-top + .bias-top { margin-top: var(--space-3); }
+    .bias-top__label {
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--gold-600);
+      font-weight: 700;
+      margin-bottom: var(--space-1);
+    }
+    .bias-top__name { font-size: 1.1rem; font-weight: 750; color: var(--ink-900); margin-bottom: var(--space-2); }
+    .bias-top__desc { font-size: 0.95rem; color: var(--ink-700); margin-bottom: var(--space-3); }
+    .bias-top__tips { margin: 0; padding-left: 1.2em; font-size: 0.93rem; color: var(--ink-500); }
+    .bias-top__tips li { margin-bottom: 6px; }
+
+    .bias-actions { margin-top: var(--space-5); display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; }
+    .bias-actions__note { font-size: 12px; color: var(--ink-300); }
+
+    .bias-cards { display: grid; gap: var(--space-3); margin: var(--space-4) 0; }
+    .bias-card {
+      padding: var(--space-4) var(--space-5);
+      border: 1px solid var(--ink-100);
+      border-left: 4px solid var(--gold-500);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+    }
+    .bias-card__name { font-weight: 700; color: var(--ink-900); margin-bottom: var(--space-1); }
+    .bias-card__en { font-size: 12px; color: var(--ink-300); font-family: var(--font-mono); margin-left: 6px; }
+
+    .fix-list { display: grid; gap: var(--space-3); margin: var(--space-4) 0; }
+    .fix-item {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-md);
+    }
+    .fix-item__num {
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--gold-100);
+      color: var(--gold-600);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 750;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .fix-item__title { font-weight: 700; color: var(--ink-900); margin-bottom: 2px; }
+    .fix-item__body { font-size: 0.95rem; color: var(--ink-500); }
+
+    @media (max-width: 560px) {
+      .bias-row { grid-template-columns: 78px minmax(0, 1fr) 38px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：一个很聪明的人</a>
+        <a class="sidebar__link" href="#loss">损失厌恶：亏钱的痛被放大</a>
+        <a class="sidebar__link" href="#anchor">锚定效应：被买入价绑架</a>
+        <a class="sidebar__link" href="#herd">羊群效应与 FOMO</a>
+        <a class="sidebar__link" href="#overconfidence">过度自信：最危险的那一个</a>
+        <a class="sidebar__link" href="#test">动手：行为偏差自测</a>
+        <a class="sidebar__link" href="#fix">怎么和大脑相处</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块五 · 风险与人性</div>
+        <h1 class="hero__title">行为金融学：为什么聪明人也会亏钱</h1>
+        <p class="hero__lead">
+          投资失败的大多数原因，不是不懂公式，而是懂了公式却做不到。
+          这一章讲的不是知识，是你大脑里那几套出厂设置。
+        </p>
+      </header>
+
+      <!-- 本章目标 -->
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>认出损失厌恶、锚定、羊群、过度自信这四种最常见的偏差</span></li>
+          <li><span class="goal-list__check">2</span><span>通过自测了解自己最容易犯哪一类错误，以及它在投资里长什么样</span></li>
+          <li><span class="goal-list__check">3</span><span>用规则化、自动化和投资日记，把「知道」变成「做到」</span></li>
+        </ul>
+      </section>
+
+      <!-- 开场故事 -->
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">一个很聪明的人</h2>
+
+        <div class="story">
+          <div class="story__label">真实场景 · 2015 年</div>
+          <p>
+            他 40 岁，名校博士，做技术工作，逻辑严密，是那种会把家里每一笔开销都记进表格的人。
+            2015 年 4 月，他在同事的饭局上第一次听说「炒股一个月赚了半年工资」。
+          </p>
+          <p>
+            他观察了两周，看着指数天天涨，终于开了户。第一只股票，他研究了三个晚上，
+            买入后涨了 20%，他立刻卖掉——「落袋为安」。
+          </p>
+          <p>
+            第二只股票，他同样研究了很久，买入后跌了 15%。他没有卖：
+            「基本面没变，只是市场情绪。」跌到 30% 时，他补了一次仓，摊低成本。
+            跌到 45% 时，他终于扛不住，全部卖出。
+          </p>
+          <p>
+            半年后，市场反弹。他卖掉的第二只股票涨回了他当初的买入价，
+            但他已经没有仓位了。三年后算总账，他亏了 30%。
+          </p>
+          <p>
+            复盘时他说：「运气不好，刚好赶上了股灾。」
+            <strong>但他卖第一只、扛第二只、在最低点割肉，没有一步是运气决定的。</strong>
+          </p>
+          <div class="story__question">
+            一个在工作中能做出复杂决策的人，为什么一到投资就反复犯错？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          因为投资面对的是一套专门针对人性的环境：即时反馈、真金白银、
+          高度不确定、还有一群同样紧张的人在你旁边。在这种环境里，
+          大脑会自动切换到几套省力的默认程序——行为金融学把它们叫做<strong>偏差</strong>。
+          偏差不是愚蠢，它是人类在几百万年里进化出来的快捷方式，只是在市场里经常帮倒忙。
+        </p>
+      </section>
+
+      <!-- 损失厌恶 -->
+      <section class="section" id="loss">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">损失厌恶：亏钱的痛，被放大了两倍</h2>
+
+        <p>
+          <strong>损失厌恶（Loss Aversion）</strong>是行为金融学里最基础、也最有力的发现：
+          同样金额的损失和收益，<strong>损失带来的痛苦，大约是收益带来的快乐的两倍</strong>。
+          丢了 100 块的难受，远大于捡到 100 块的开心。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">它从哪来</div>
+            <p style="margin-bottom:0;">
+              卡尼曼和特沃斯基的「前景理论」发现，人对得失的感受不是线性的：
+              以某个参照点为界，亏损一侧的曲线比收益一侧更陡。
+              粗略地说，亏 100 元的痛，需要赚 200 元左右才能抵消。
+              这在进化上是合理的——在野外，损失一顿食物可能意味着死亡，
+              多摘一个果子只是锦上添花。
+            </p>
+            <div class="concept__analogy">
+              像手机电量。从 100% 掉到 50%，你会焦虑；从 50% 充到 100%，
+              你只是「恢复正常」。同样是 50 个百分点，感受完全不对称。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">它在投资里长什么样：处置效应</div>
+            <p style="margin-bottom:0;">
+              最典型的表现叫<strong>处置效应</strong>：赚了的股票急着卖，亏了的股票死扛。
+              因为卖出盈利是「确认快乐」，卖出亏损是「确认痛苦」，
+              而人天生想逃避确认痛苦。结果是：你把涨得好的资产卖掉了，
+              把跌得差的资产留在组合里——这正好和「让利润奔跑、及时止损」相反。
+            </p>
+            <div class="concept__analogy">
+              像整理衣柜。你舍不得扔那件买贵了却从不穿的外套（怕承认买错），
+              却把真正常穿的衣服送人。最后衣柜里剩下的，全是你不穿的东西。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">它还会让你不敢行动</div>
+            <p style="margin-bottom:0;">
+              损失厌恶不只影响卖出，也影响买入。因为「买入后可能亏」的画面太生动，
+              很多人把现金一直放在活期里，看着购买力被通胀慢慢吃掉。
+              不行动看起来没有损失，其实也在承担一种确定发生的损失。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 锚定 -->
+      <section class="section" id="anchor">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">锚定效应：被一个无关的数字绑架</h2>
+
+        <p>
+          <strong>锚定效应（Anchoring）</strong>是指：人在做判断时，会不自觉地抓住一个
+          最先出现的数字，然后围绕它调整，而且调整得远远不够。
+          这个数字可能毫无意义，但它会牢牢影响你的决定。
+        </p>
+
+        <p>
+          在投资里，最常见的锚就是<strong>你的买入价</strong>。
+          「等回到 50 块我就卖」「跌破了我的成本，我不能割」——
+          这些想法的潜台词是：买入价决定了这只资产「应该值多少钱」。
+          但市场根本不知道你多少钱买的。买入价是你的私人记忆，不是资产的属性。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">锚定在生活里随处可见</div>
+            <p style="margin-bottom:0;">
+              商场标「原价 999，现价 399」，你会觉得赚了，因为 999 是一个被故意放上去的锚。
+              谈判时先报价的人，往往能把最终结果拉向自己——不是因为他的价格合理，
+              而是因为对方的大脑已经开始围绕这个数字思考。
+            </p>
+            <div class="concept__analogy">
+              像在一张白纸上先画一个点，之后所有人讨论位置时，都会不自觉地从那个点开始量。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">投资里的三种锚</div>
+            <p style="margin-bottom:0;">
+              <strong>成本锚：</strong>「等回本就卖」。<br>
+              <strong>高点锚：</strong>「它以前到过 100，现在 60 很便宜」。<br>
+              <strong>他人收益锚：</strong>「别人都赚了 30%，我才赚 5%，等于亏了」。
+              第三种最隐蔽，因为它把「别人的结果」变成了你的参照点，
+              让你在本该满足的时候感到痛苦，在本该谨慎的时候追加风险。
+            </p>
+          </div>
+        </div>
+
+        <div class="card card--gold">
+          <div class="card__title">一个替换问题</div>
+          <p style="margin-bottom:0;">
+            当你发现自己又在想「等回本」时，问自己一个替换问题：
+            <strong>如果我现在是空仓，手里是现金，我还会用这个价格买它吗？</strong>
+            如果答案是「不会」，那你想等的其实不是回本，是不肯承认判断错了。
+            市场不会因为你承认得晚一点，就少收你一点学费。
+          </p>
+        </div>
+      </section>
+
+      <!-- 羊群 -->
+      <section class="section" id="herd">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">羊群效应与 FOMO：别人都在赚钱</h2>
+
+        <p>
+          <strong>羊群效应（Herding）</strong>是指在不确定的环境里，人会放弃独立判断，
+          跟随大多数人的行为。它不完全是坏事：在信息不足时，跟随群体是一种省力的学习方式。
+          但在市场里，群体本身往往就是由同样慌张、同样贪婪的人组成的。
+        </p>
+
+        <p>
+          和羊群效应结伴出现的，是 <strong>FOMO（Fear of Missing Out，错失恐惧）</strong>。
+          看到同事、朋友、社交媒体上的人都在赚钱，你会产生一种「只有我被落下了」的焦虑。
+          这种焦虑会绕过你的分析系统，直接推动你买入——而且往往是在最贵的时候。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">为什么「基金发行最火」常常是坏信号</div>
+            <p style="margin-bottom:0;">
+              基金销售最火爆的时候，通常是市场涨了很久、人人都在谈论股票的时候。
+              基金公司顺势发行新产品，投资者排队申购。但此时估值往往已经不便宜，
+              接下来的收益预期反而更低。这不是巧合，而是羊群效应的直接结果：
+              <strong>资金的流入本身就是情绪的度量</strong>。
+            </p>
+            <div class="concept__analogy">
+              像一家餐厅门口排了很长的队。队伍本身不证明菜好吃，
+              只证明「很多人认为它好吃」——而在市场里，这个循环会在某个时刻突然反转。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">社交媒体如何放大它</div>
+            <p style="margin-bottom:0;">
+              算法会把「赚钱的故事」推给你，因为这类内容更容易获得点击。
+              你看到的不是随机样本，而是被筛选过的幸存者：
+              晒收益的人很多，晒亏损的人很少。
+              久而久之，你会高估「别人都在赚」的概率，也高估自己「不参与就亏了」的紧迫感。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 过度自信 -->
+      <section class="section" id="overconfidence">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">过度自信：最危险的那一个</h2>
+
+        <p>
+          <strong>过度自信（Overconfidence）</strong>是指人系统性地高估自己的判断力、
+          信息优势和掌控能力。它最危险的地方在于：<strong>它让你感觉良好</strong>，
+          所以你很难自己发现它。
+        </p>
+
+        <p>
+          心理学研究里有一个稳定的结论：大多数司机认为自己的驾驶技术高于平均水平，
+          大多数投资者认为自己的选股能力高于平均水平——这在数学上不可能同时成立。
+          更麻烦的是，懂得越多的人，越容易过度自信，因为知识会让人低估「自己不知道的部分」。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">表现一：频繁交易</div>
+            <p style="margin-bottom:0;">
+              过度自信的人相信自己能判断短期涨跌，于是频繁买卖。
+              但交易有成本，判断有误差。Barber 和 Odean 对美国券商账户的研究发现，
+              交易越频繁的账户，扣除成本后的净收益越低。
+              频繁交易带来的不是更多机会，而是更多犯错的机会。
+            </p>
+            <div class="concept__analogy">
+              像一个觉得自己每一把都能赢的牌手，打得越多，越接近赌场的数学期望。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">表现二：集中押注与加杠杆</div>
+            <p style="margin-bottom:0;">
+              过度自信会让你觉得「我看得这么准，没必要分散」，于是把仓位集中在少数几只股票上；
+              再进一步，你会觉得「既然这么确定，为什么不用杠杆」。
+              杠杆不会提高判断的准确率，它只会放大判断错误后的后果。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">表现三：后见之明偏差</div>
+            <p style="margin-bottom:0;">
+              「我早就知道它会涨」「当时我就觉得不对劲」——事后回看，事情总是显得可预测。
+              这种「事后聪明」会让你高估自己的预测能力，下次更加自信，
+              也更不愿意承认运气在结果里的作用。
+            </p>
+            <div class="concept__analogy">
+              像看完侦探小说的最后一页，再回头看前面的线索，觉得凶手一直很明显。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 自测 -->
+      <section class="section" id="test">
+        <div class="section__label">动手试试</div>
+        <h2 class="section__title">行为偏差自测：你的默认设置是哪一种</h2>
+
+        <p>
+          下面 10 道题，没有正确答案。每道题请选「最接近你真实反应」的那一项，
+          而不是「你觉得应该选」的那一项。<strong>选得越诚实，结果越有用。</strong>
+        </p>
+
+        <div class="bias-test" id="bias-test">
+          <div class="bias-test__head">
+            <div>
+              <div class="bias-test__title">10 题 · 行为偏差自测</div>
+              <div class="bias-test__sub">结果会给出四类偏差的分布，而不是分数</div>
+            </div>
+            <div class="bias-test__progress" id="bt-progress">第 1 / 10 题</div>
+          </div>
+          <div class="bias-test__track"><div class="bias-test__track-fill" id="bt-track"></div></div>
+          <div id="bt-body">
+            <div class="bias-test__question" id="bt-question"></div>
+            <div class="bias-test__options" id="bt-options"></div>
+          </div>
+          <div class="bias-test__result" id="bt-result"></div>
+        </div>
+
+        <p style="font-size:0.9rem; color: var(--ink-300);">
+          说明：这是一个自我觉察工具，不是心理诊断。它只描述你在这些具体场景里的倾向，
+          不定义你是什么样的人。
+        </p>
+      </section>
+
+      <!-- 应对 -->
+      <section class="section" id="fix">
+        <div class="section__label">怎么办</div>
+        <h2 class="section__title">怎么和大脑相处：别靠意志力，靠设计</h2>
+
+        <p>
+          知道偏差存在，并不能让你免疫。实验反复证明：即使受过专业训练的投资者，
+          在被提醒偏差之后，仍然会犯同样的错误。所以应对的思路不是「下次注意」，
+          而是<strong>提前设计好一套机制，让偏差没有机会发作</strong>。
+        </p>
+
+        <div class="fix-list">
+          <div class="fix-item">
+            <div class="fix-item__num">1</div>
+            <div>
+              <div class="fix-item__title">规则化：把决定写在情绪之前</div>
+              <div class="fix-item__body">
+                在买入之前，写下三件事：为什么买、什么情况下卖、最多能接受多少亏损。
+                写下来的规则，会在你想「再等等」的时候，给你一个外部的参照。
+                规则不需要复杂，但必须具体到可以执行。
+              </div>
+            </div>
+          </div>
+
+          <div class="fix-item">
+            <div class="fix-item__num">2</div>
+            <div>
+              <div class="fix-item__title">自动化：让系统替你做决定</div>
+              <div class="fix-item__body">
+                定投是最典型的例子：设定好日期和金额，自动扣款。
+                它的作用不是「摊平成本」这么简单，而是把「今天该不该买」这个决策
+                从你手里拿走，从而绕过了择时冲动和损失厌恶。
+                自动再平衡也是同一个思路。
+              </div>
+            </div>
+          </div>
+
+          <div class="fix-item">
+            <div class="fix-item__num">3</div>
+            <div>
+              <div class="fix-item__title">投资日记：记录当时的理由和情绪</div>
+              <div class="fix-item__body">
+                每次买卖，记下日期、价格、理由，以及当时的心情。
+                三个月后回看，你会发现很多「理性决策」其实是情绪驱动的。
+                日记的价值不在于复盘对错，而在于让你看见自己的模式。
+              </div>
+            </div>
+          </div>
+
+          <div class="fix-item">
+            <div class="fix-item__num">4</div>
+            <div>
+              <div class="fix-item__title">降低查看频率：别让波动喂养情绪</div>
+              <div class="fix-item__body">
+                每天看十次账户，你会经历十次小幅的情绪波动，而其中大部分毫无信息量。
+                把查看频率降到每周或每月一次，不会改变你的长期收益，
+                但会显著降低你「忍不住操作」的概率。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--info">
+          <div class="card__title">最后一个建议：和自己比，不和别人比</div>
+          <p style="margin-bottom:0;">
+            羊群效应和锚定效应都需要一个参照点。如果你把参照点从「别人的收益」
+            换成「自己的目标和期限」，大部分焦虑会自然消失。
+            投资不是一场排名赛，你只需要在自己的时间表上，到达自己的目的地。
+          </p>
+        </div>
+      </section>
+
+      <!-- 误区 -->
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">行为偏差是智商问题，聪明人不会犯</div>
+            <div class="myth__right">偏差和智商关系不大，越是自信、信息越多的人，越容易过度自信。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">知道偏差的名字就能避免它</div>
+            <div class="myth__right">知道不等于做到。有效的方法是规则、自动化和外部约束，而不是临场提醒自己。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">亏损时死扛是因为看好基本面</div>
+            <div class="myth__right">先问自己：如果现在空仓，我还会买吗？如果不会，那可能只是不愿承认亏损。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <!-- 术语卡 -->
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">行为金融学<span class="glossary__en">Behavioral Finance</span></div>
+            <div class="glossary__def">研究心理因素如何影响投资决策和资产价格的学科。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">损失厌恶<span class="glossary__en">Loss Aversion</span></div>
+            <div class="glossary__def">同等金额下，损失带来的痛苦约为收益快乐的两倍。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">前景理论<span class="glossary__en">Prospect Theory</span></div>
+            <div class="glossary__def">描述人在不确定下如何做决策，核心是参照点和损失厌恶。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">处置效应<span class="glossary__en">Disposition Effect</span></div>
+            <div class="glossary__def">倾向于卖出盈利资产、继续持有亏损资产。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">锚定效应<span class="glossary__en">Anchoring</span></div>
+            <div class="glossary__def">过度依赖最先出现的数字做判断，如买入价、历史高点。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">羊群效应<span class="glossary__en">Herding</span></div>
+            <div class="glossary__def">在不确定时放弃独立判断，跟随大多数人的行为。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">FOMO<span class="glossary__en">Fear of Missing Out</span></div>
+            <div class="glossary__def">害怕错过上涨而仓促入场，往往发生在情绪高点。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">过度自信<span class="glossary__en">Overconfidence</span></div>
+            <div class="glossary__def">高估自己的判断力，导致频繁交易、集中持仓和加杠杆。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 下一章 -->
+      <section class="section">
+        <a class="next-chapter" href="../20-asset-allocation/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 20 章</div>
+            <div class="next-chapter__title">资产配置：先决定比例，再决定买什么</div>
+          </div>
+          <span class="next-chapter__link">继续 →</span>
+        </a>
+      </section>
+
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 行为偏差自测 ---------- */
+    const BIASES = {
+      loss: {
+        name: '损失厌恶',
+        en: 'Loss Aversion',
+        color: '#b91c1c',
+        desc: '你对亏损的痛感明显强于同等收益的快乐。在投资里，它容易表现为「赚一点就跑、亏很多还扛着」，或者因为害怕亏损而迟迟不敢开始投资。',
+        tips: [
+          '在买入前写下「最多能接受亏多少」，把它变成事先决定，而不是临场感受。',
+          '卖出前问自己：如果现在是空仓，我还会买它吗？',
+          '不要每天看账户，降低波动对情绪的喂养频率。'
+        ]
+      },
+      anchor: {
+        name: '锚定效应',
+        en: 'Anchoring',
+        color: '#b45309',
+        desc: '你容易把买入价、历史高点或别人的收益当成「应该值多少」的标准。这些数字和市场无关，却会悄悄决定你的买卖。',
+        tips: [
+          '把决策依据从「我的成本」换成「它未来能产生多少现金流」。',
+          '给自己设一个冷静问题：如果没有这只股票，我今天会买它吗？',
+          '记录买入理由，定期检查理由是否还成立，而不是只看价格。'
+        ]
+      },
+      herd: {
+        name: '羊群效应',
+        en: 'Herding / FOMO',
+        color: '#1d4ed8',
+        desc: '你在不确定时容易跟随大多数人的行为，害怕错过、也害怕和别人不一样。市场情绪最高的时候，往往也是这种倾向最容易被触发的时候。',
+        tips: [
+          '给自己定一个「不在情绪高点买入」的规则，比如大涨后暂停一周再决定。',
+          '减少刷收益晒单的频率，你看到的是幸存者样本。',
+          '把参照点从「别人赚了多少」换成「我的目标和期限」。'
+        ]
+      },
+      overconf: {
+        name: '过度自信',
+        en: 'Overconfidence',
+        color: '#6d28d9',
+        desc: '你对自己的判断力和信息优势比较有信心。这在工作中是优点，但在投资里容易变成频繁交易、集中持仓和加杠杆。',
+        tips: [
+          '统计自己过去一年的交易记录，看看扣除成本后是否真的跑赢了指数。',
+          '强制分散：单一资产不超过总仓位的一个固定上限。',
+          '每次想「这次不一样」时，写下三个可能证明你错了的证据。'
+        ]
+      }
+    };
+
+    const QUESTIONS = [
+      {
+        q: '你半年前买的一只股票跌了 20%，你的第一反应是：',
+        options: [
+          { text: '没卖就不算亏，先拿着等回本。', bias: 'loss' },
+          { text: '我买的时候是 50 元，等回到 50 元再卖。', bias: 'anchor' },
+          { text: '群里的人都没卖，我也先不动。', bias: 'herd' },
+          { text: '只是短期波动，我当初的判断没问题。', bias: 'overconf' }
+        ]
+      },
+      {
+        q: '同事说他买的基金半年赚了 30%，你会：',
+        options: [
+          { text: '有点怕错过这波，想赶紧也买一点。', bias: 'herd' },
+          { text: '我研究一下，应该能挑到比这更好的。', bias: 'overconf' },
+          { text: '别人赚了我没赚，感觉自己亏了。', bias: 'loss' },
+          { text: '它现在 3 块了，等跌回 2 块再买。', bias: 'anchor' }
+        ]
+      },
+      {
+        q: '账户里有一只赚 10% 的股票和一只亏 15% 的股票，你急需用钱：',
+        options: [
+          { text: '不能卖亏的，等它回本再说。', bias: 'anchor' },
+          { text: '先卖赚的那只，落袋为安。', bias: 'loss' },
+          { text: '我选的股票迟早会涨回来，不用急着卖。', bias: 'overconf' },
+          { text: '看看身边人最近在卖什么。', bias: 'herd' }
+        ]
+      },
+      {
+        q: '市场突然大跌，新闻标题都是「恐慌抛售」：',
+        options: [
+          { text: '大家都在跑，我也赶紧跑。', bias: 'herd' },
+          { text: '先卖掉一部分，少亏一点是一点。', bias: 'loss' },
+          { text: '我知道这是底部，准备抄底。', bias: 'overconf' },
+          { text: '等回到我买入的价格再说。', bias: 'anchor' }
+        ]
+      },
+      {
+        q: '你持有一只股票三年没涨，最近突然涨了 20%：',
+        options: [
+          { text: '我就知道它不会一直趴着，我的耐心是对的。', bias: 'overconf' },
+          { text: '听说最近很多人都在买它。', bias: 'herd' },
+          { text: '还没到我当初买的价格，再等等。', bias: 'anchor' },
+          { text: '赶紧卖，怕利润又跌回去。', bias: 'loss' }
+        ]
+      },
+      {
+        q: '你准备写一份投资计划，你最可能怎么写：',
+        options: [
+          { text: '以我的买入成本为基准，设定什么时候卖。', bias: 'anchor' },
+          { text: '计划赶不上变化，临场判断更靠谱。', bias: 'overconf' },
+          { text: '重点写「怎么避免亏钱」，亏钱的画面让我更难受。', bias: 'loss' },
+          { text: '先看看身边有经验的人在买什么。', bias: 'herd' }
+        ]
+      },
+      {
+        q: '账户浮亏 30%，这时你急需一笔钱：',
+        options: [
+          { text: '看大家都在割肉，我也跟着卖。', bias: 'herd' },
+          { text: '等回到成本价再卖，哪怕再等一年。', bias: 'anchor' },
+          { text: '宁愿找朋友借，也不想在亏损时卖出。', bias: 'loss' },
+          { text: '我的组合基本面很好，很快就会反弹。', bias: 'overconf' }
+        ]
+      },
+      {
+        q: '你花了两周研究一家公司，然后重仓买入：',
+        options: [
+          { text: '我比市场更懂这家公司。', bias: 'overconf' },
+          { text: '每天看十次账户，跌一点就睡不着。', bias: 'loss' },
+          { text: '只要涨过我的买入价，我就觉得安全了。', bias: 'anchor' },
+          { text: '看到几个大 V 也在推荐，我更放心了。', bias: 'herd' }
+        ]
+      },
+      {
+        q: '过去一年你的收益跑赢了指数：',
+        options: [
+          { text: '我把现在的净值当成新的底线，不能低于它。', bias: 'anchor' },
+          { text: '我开始在群里分享，跟着朋友一起加仓。', bias: 'herd' },
+          { text: '说明我有天赋，可以加大仓位。', bias: 'overconf' },
+          { text: '我更担心把赚到的利润亏回去。', bias: 'loss' }
+        ]
+      },
+      {
+        q: '关于「卖出规则」，你的真实想法是：',
+        options: [
+          { text: '我主要看市场情绪，大家卖我就卖。', bias: 'herd' },
+          { text: '我不需要规则，我能临场判断。', bias: 'overconf' },
+          { text: '我很难接受止损，那等于承认自己错了。', bias: 'loss' },
+          { text: '我会以买入价为准，设一个止盈止损线。', bias: 'anchor' }
+        ]
+      }
+    ];
+
+    const btProgress = document.getElementById('bt-progress');
+    const btTrack = document.getElementById('bt-track');
+    const btQuestion = document.getElementById('bt-question');
+    const btOptions = document.getElementById('bt-options');
+    const btResult = document.getElementById('bt-result');
+    const btBody = document.getElementById('bt-body');
+
+    let btIndex = 0;
+    let btAnswers = [];
+    let btLocked = false;
+
+    function renderBiasQuestion() {
+      btLocked = false;
+      btProgress.textContent = `第 ${btIndex + 1} / ${QUESTIONS.length} 题`;
+      btTrack.style.width = ((btIndex / QUESTIONS.length) * 100) + '%';
+      btQuestion.textContent = QUESTIONS[btIndex].q;
+      btOptions.innerHTML = '';
+
+      QUESTIONS[btIndex].options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'bias-test__option';
+        btn.textContent = opt.text;
+        btn.addEventListener('click', () => pickBias(opt.bias, btn));
+        btOptions.appendChild(btn);
+      });
+    }
+
+    function pickBias(bias, btn) {
+      if (btLocked) return;
+      btLocked = true;
+      btAnswers.push(bias);
+      btn.classList.add('is-picked');
+      btOptions.querySelectorAll('.bias-test__option').forEach((b) => { b.disabled = true; });
+
+      window.setTimeout(() => {
+        btIndex += 1;
+        if (btIndex < QUESTIONS.length) {
+          renderBiasQuestion();
+        } else {
+          showBiasResult();
+        }
+      }, 220);
+    }
+
+    function showBiasResult() {
+      btProgress.textContent = '已完成';
+      btTrack.style.width = '100%';
+      btBody.style.display = 'none';
+
+      const counts = { loss: 0, anchor: 0, herd: 0, overconf: 0 };
+      btAnswers.forEach((b) => { counts[b] += 1; });
+
+      const order = ['loss', 'anchor', 'herd', 'overconf'];
+      const maxCount = Math.max(...order.map((k) => counts[k]));
+      const tops = order.filter((k) => counts[k] === maxCount);
+      const sorted = order.slice().sort((a, b) => counts[b] - counts[a]);
+
+      const bars = sorted.map((key) => {
+        const meta = BIASES[key];
+        const count = counts[key];
+        const width = (count / QUESTIONS.length) * 100;
+        return `<div class="bias-row ${count === maxCount ? 'is-top' : ''}">
+          <div class="bias-row__name">${meta.name}</div>
+          <div class="bias-row__track">
+            <div class="bias-row__fill" style="width:${width}%; background:${meta.color};"></div>
+          </div>
+          <div class="bias-row__count">${count} / 10</div>
+        </div>`;
+      }).join('');
+
+      const topCards = tops.map((key) => {
+        const meta = BIASES[key];
+        return `<div class="bias-top">
+          <div class="bias-top__label">${tops.length > 1 ? '并列主导偏差' : '你的主导偏差'}</div>
+          <div class="bias-top__name">${meta.name} <span style="font-size:12px;color:#94a3b8;font-weight:400;">${meta.en}</span></div>
+          <div class="bias-top__desc">${meta.desc}</div>
+          <ul class="bias-top__tips">
+            ${meta.tips.map((t) => `<li>${t}</li>`).join('')}
+          </ul>
+        </div>`;
+      }).join('');
+
+      let headline;
+      if (tops.length > 1) {
+        headline = `你有 ${tops.length} 类偏差并列最高。它们经常一起出现、互相放大，建议先处理其中最容易识别的那一个。`;
+      } else if (maxCount >= 7) {
+        headline = '你的选择高度集中在一种偏差上。这说明它在你的决策里非常稳定，也意味着只要针对它设计规则，改善会很明显。';
+      } else if (maxCount >= 4) {
+        headline = `「${BIASES[tops[0]].name}」是你最明显的倾向。它不会每次都出现，但在压力大、信息混乱的时候，最容易接管你的决策。`;
+      } else {
+        headline = '你的偏差分布比较分散，这通常是好事：没有哪一类情绪特别主导你的决策。不过，分散不等于没有，仍然值得留意最高的一项。';
+      }
+
+      btResult.innerHTML = `
+        <div class="bias-result__title">你的偏差分布</div>
+        <div class="bias-result__lead">${headline}</div>
+        ${bars}
+        ${topCards}
+        <div class="bias-top" style="border-color:#e2e8f0;background:var(--bg-soft);">
+          <div class="bias-top__label" style="color:var(--ink-500);">给所有人的一条建议</div>
+          <div class="bias-top__desc" style="margin-bottom:0;">
+            偏差不会因为你知道它就消失。真正有效的做法是：
+            <strong>把重要的决定提前写下来，把重复的动作交给自动化</strong>，
+            让自己在情绪上来的时候，只需要执行，而不需要重新判断。
+          </div>
+        </div>
+        <div class="bias-actions">
+          <button type="button" class="btn btn--ghost" id="bt-reset">重新测一次</button>
+          <span class="bias-actions__note">本测试仅用于自我觉察，不构成投资建议。</span>
+        </div>
+      `;
+      btResult.classList.add('is-visible');
+
+      document.getElementById('bt-reset').addEventListener('click', resetBiasTest);
+    }
+
+    function resetBiasTest() {
+      btIndex = 0;
+      btAnswers = [];
+      btLocked = false;
+      btBody.style.display = '';
+      btResult.classList.remove('is-visible');
+      btResult.innerHTML = '';
+      renderBiasQuestion();
+    }
+
+    renderBiasQuestion();
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '损失厌恶在投资中最典型的表现是？',
+        options: [
+          '赚了就跑，亏了死扛',
+          '只买指数基金',
+          '长期持有不动',
+          '每次都要研究很久才买'
+        ],
+        answer: 0,
+        explain: '因为卖出亏损会「确认痛苦」，人会本能地回避，于是留下亏损资产、卖掉盈利资产，这就是处置效应。'
+      },
+      {
+        question: '「等回到我的买入价就卖」最符合哪一种偏差？',
+        options: ['羊群效应', '锚定效应', '损失厌恶', '过度自信'],
+        answer: 1,
+        explain: '买入价是一个与市场无关的数字，却成了判断「该不该卖」的基准，这是典型的锚定。'
+      },
+      {
+        question: '基金发行最火爆、身边人都在讨论股票的时候，通常意味着？',
+        options: [
+          '市场即将进入长期上涨',
+          '此时买入最安全',
+          '市场情绪处于高位，未来收益预期可能更低',
+          '基金经理水平最高'
+        ],
+        answer: 2,
+        explain: '资金流入本身就是情绪的度量。发行最热往往对应情绪高点，而不是收益高点。'
+      },
+      {
+        question: '减少行为偏差最有效的做法是？',
+        options: [
+          '每次决策前提醒自己「要理性」',
+          '多看财经新闻，掌握更多信息',
+          '事先写下规则，并用自动化执行',
+          '跟着有经验的人操作'
+        ],
+        answer: 2,
+        explain: '知道不等于做到。规则化和自动化把决策从情绪现场移走，比临场自我提醒有效得多。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch19');
+  </script>
+</body>
+</html>

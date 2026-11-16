@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 11 章 · 基金：把钱交给专业的人 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    /* 本章：基金费率对比实验 */
+    .fund-lab {
+      margin: var(--space-5) 0;
+      padding: var(--space-5);
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .fund-lab__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-4);
+    }
+
+    .fund-lab__title {
+      font-weight: 700;
+      color: var(--ink-900);
+    }
+
+    .fund-switch {
+      display: inline-flex;
+      gap: 4px;
+      padding: 3px;
+      background: var(--bg-soft);
+      border-radius: 999px;
+    }
+
+    .fund-switch button {
+      border: none;
+      background: transparent;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-500);
+      padding: 5px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .fund-switch button.is-active {
+      background: var(--ink-900);
+      color: #fff;
+    }
+
+    .fund-legend {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--ink-500);
+      margin-bottom: var(--space-3);
+    }
+
+    .fund-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fund-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .fund-dot--low { background: var(--gold-500); }
+    .fund-dot--high { background: var(--ink-300); }
+
+    .fund-chart {
+      display: flex;
+      align-items: stretch;
+      gap: 4px;
+      height: 230px;
+      padding: var(--space-3) var(--space-2) 0;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .fund-year {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .fund-year__bars {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      min-height: 0;
+    }
+
+    .fund-bar {
+      flex: 1;
+      min-height: 1px;
+      border-radius: 2px 2px 0 0;
+      transition: height 0.35s ease;
+    }
+
+    .fund-bar--low { background: var(--gold-500); }
+    .fund-bar--high { background: var(--ink-300); }
+
+    .fund-year__label {
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--ink-300);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .fund-readout {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+
+    .fund-stat {
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      background: var(--bg-soft);
+    }
+
+    .fund-stat b {
+      display: block;
+      font-size: 1.5rem;
+      line-height: 1.3;
+      color: var(--ink-900);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .fund-stat small {
+      font-size: 12px;
+      color: var(--ink-500);
+    }
+
+    .fund-stat--low {
+      background: var(--gold-100);
+    }
+
+    .fund-stat--low b { color: var(--gold-600); }
+
+    .fund-note {
+      margin-top: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-soft);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: var(--ink-500);
+      line-height: 1.7;
+    }
+
+    /* 未作答时不显示「下一题」 */
+    .quiz__next { display: none; }
+    .quiz__next.is-visible { display: inline-flex; }
+
+    @media (max-width: 640px) {
+      .fund-readout { grid-template-columns: 1fr; }
+      .fund-chart { height: 190px; gap: 2px; }
+      .fund-year__label { font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <!-- 侧边目录 -->
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：两个同事的 20 年</a>
+        <a class="sidebar__link" href="#what">基金是什么</a>
+        <a class="sidebar__link" href="#public">公募 vs 私募</a>
+        <a class="sidebar__link" href="#active">主动 vs 被动</a>
+        <a class="sidebar__link" href="#fees">费率结构</a>
+        <a class="sidebar__link" href="#lab">算一算 20 年后的差距</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块三 · 投资工具</div>
+        <h1 class="hero__title">基金：把钱交给专业的人</h1>
+        <p class="hero__lead">
+          两个人买同样的底层资产，一个人每年多付 1% 的费用。
+          20 年后，这 1% 会吃掉多少钱？答案可能比你想象的大。
+        </p>
+      </header>
+
+      <!-- 本章目标 -->
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>说清基金在做什么，以及「托管人」为什么是保护你的关键角色</span></li>
+          <li><span class="goal-list__check">2</span><span>分清公募与私募、主动与被动、ETF 与 LOF，知道它们各自适合谁</span></li>
+          <li><span class="goal-list__check">3</span><span>算清费率对长期收益的侵蚀，记住「费率是确定的，超额收益是不确定的」</span></li>
+        </ul>
+      </section>
+
+      <!-- 开场故事 -->
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">两个同事的 20 年</h2>
+
+        <div class="story">
+          <div class="story__label">一个简化的例子</div>
+          <p>
+            2015 年，小张和小李各拿出 10 万元投资。两人都不懂选股，于是都选择了基金。
+          </p>
+          <p>
+            小张买了一只宽基指数基金，综合费率大约 <strong>0.5%</strong>；
+            小李买了一只当年的明星主动基金，综合费率大约 <strong>1.5%</strong>。
+            为了方便比较，假设两人买的底层资产毛收益完全一样，都是每年 8%。
+          </p>
+          <p>
+            小张的净收益是每年 7.5%，小李是每年 6.5%。第一年，两人差了约 1000 元，
+            小李觉得「这点费率无所谓」。
+          </p>
+          <p>
+            20 年后：小张的 10 万变成约 <strong>42.5 万</strong>，
+            小李的 10 万变成约 <strong>35.2 万</strong>。两人相差 <strong>7.3 万</strong>，
+            小李少了大约 <strong>17%</strong>。
+          </p>
+          <div class="story__question">
+            小李说：「可是主动基金不是能跑赢指数吗？」问题是：他需要每年多赚多少，
+            才能追平这 1% 的费率差？而且，他能在 20 年里<strong>每年</strong>都做到吗？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          答案的第一半是数学：他每年要多赚约 1%，才能打平。第二半是现实：
+          <strong>连续 20 年每年多赚 1%</strong>，比看起来难得多。
+          这就是本章想让你记住的一句话：<strong>费率是确定的，超额收益是不确定的。</strong>
+        </p>
+      </section>
+
+      <!-- 核心概念一 -->
+      <section class="section" id="what">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">基金是什么：一群人拼车</h2>
+
+        <p>
+          假设你看好一篮子股票，但手里只有 1 万元，买不了几只；你也没有时间每天研究财报。
+          基金解决的就是这个问题：<strong>把很多人的钱凑在一起，按一个统一的策略去买一篮子资产</strong>，
+          每个人按出资比例持有「份额」。
+        </p>
+
+        <p>一只基金背后通常有三个角色：</p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 投资者：出钱的人</div>
+            <p style="margin-bottom:0;">
+              你买入基金份额，成为基金的持有人。你享受基金资产的收益，也承担亏损。
+              基金不保本，净值每天随底层资产波动。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 基金管理人：做决策的人</div>
+            <p style="margin-bottom:0;">
+              基金公司负责研究、选股、交易。它收管理费，不管基金涨跌，这笔费用都会按日从基金资产里计提。
+              基金经理是具体做决策的人，但基金资产不属于基金公司，也不属于基金经理个人。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 基金托管人：看住钱的人</div>
+            <p style="margin-bottom:0;">
+              通常是一家银行。基金的钱放在托管账户里，基金公司只能发出交易指令，
+              <strong>不能直接把钱转走</strong>。托管人负责核对指令、保管资产、监督投资范围。
+              这道「托管分离」是防止管理人挪用资金的关键制度。
+            </p>
+            <div class="concept__analogy">
+              基金像拼车：一个人打车太贵，一群人拼车每人便宜；基金经理是司机，负责开到哪里；
+              托管银行是平台，负责确认钱没有被司机私吞。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--info" style="margin-top: var(--space-5);">
+          <div class="card__title">净值：你手里的基金值多少钱</div>
+          <p>
+            <strong>基金净值</strong> =（基金总资产 − 总负债）÷ 基金总份额。
+            它相当于每一份基金的价格。你持有 1 万份、净值 1.5 元的基金，市值就是 1.5 万元。
+          </p>
+          <p style="margin-bottom:0;">
+            净值每天收市后计算一次（部分基金按日更新）。买入时按「未知价」原则：
+            你下单时不知道当天净值，成交后按当天收盘净值确认份额。所以短期的净值涨跌，
+            不应该成为你频繁买卖的理由。
+          </p>
+        </div>
+      </section>
+
+      <!-- 核心概念二 -->
+      <section class="section" id="public">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">公募 vs 私募：公交车与包车</h2>
+
+        <p>
+          基金可以按「向谁募集」分成两大类。它们的监管、门槛、策略和流动性都不一样。
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">公募</div>
+            <div class="compare__label">
+              向公众募集<br>
+              门槛低、监管严、披露透明<br>
+              随时可申赎（开放式）
+            </div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">私募</div>
+            <div class="compare__label">
+              向合格投资者募集<br>
+              门槛高、人数有限、披露较少<br>
+              常有锁定期
+            </div>
+          </div>
+        </div>
+
+        <p>
+          <strong>公募基金</strong>谁都能买，通常 1 元、10 元或 100 元起投。因为涉及普通人，
+          监管要求很严：投资范围有限制、持仓要定期披露、销售要讲风险提示。
+          你在银行 App、券商 App 里看到的大多数基金，都是公募。
+        </p>
+
+        <p>
+          <strong>私募基金</strong>只面向「合格投资者」，通常要求金融资产达到一定规模、
+          或年收入达到一定水平，单只基金起投金额也高（常见 100 万元）。
+          它的优势是策略更灵活：可以做多空、可以加杠杆、可以投非上市股权；
+          代价是信息披露少、流动性差（常有 6 个月到几年的锁定期），而且管理人良莠不齐。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">为什么私募要设门槛？</div>
+            <p style="margin-bottom:0;">
+              因为它的风险更高、透明度更低，不适合没有风险识别能力的人。
+              门槛的本质不是「歧视」，而是<strong>投资者适当性管理</strong>：
+              让能承受亏损、能看懂策略的人去买，减少社会性的风险外溢。
+            </p>
+            <div class="concept__analogy">
+              公募像公交车：票价便宜、路线固定、谁都能上、到站就下。
+              私募像包车：贵、路线灵活、只服务一小群人，而且中途不能随便下车。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 核心概念三 -->
+      <section class="section" id="active">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">主动 vs 被动：要不要相信基金经理</h2>
+
+        <p>
+          这是基金投资最核心的分歧。<strong>被动基金</strong>（指数基金）不试图战胜市场，
+          它只复制一个指数：沪深 300 成分股占多少权重，它就买多少，目标是跟上指数。
+          <strong>主动基金</strong>则由基金经理研究、选股、择时，目标是跑赢基准。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">主动基金的成本更高</div>
+            <p style="margin-bottom:0;">
+              要养研究团队、要频繁交易，管理费通常在 1%–1.5%，换手率高还会产生交易佣金和冲击成本。
+              被动基金不需要选股，管理费可以低到 0.15%–0.5%，换手率也低。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">扣费之后，主动基金整体跑不赢市场</div>
+            <p style="margin-bottom:0;">
+              这是一个数学事实，不需要预测谁厉害：所有投资者的持仓加权平均，就是市场本身。
+              扣掉费用之后，<strong>全体投资者的平均收益必然低于市场平均</strong>。
+              有人跑赢，就一定有人跑输，但赢家是谁、能不能持续，事前很难知道。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">巴菲特的十年赌局</div>
+            <p style="margin-bottom:0;">
+              2008 年，巴菲特用 50 万美元和一家对冲基金公司打赌：未来十年，标普 500 指数基金的收益
+              会超过一篮子精选对冲基金。2017 年赌局结束，指数基金大幅获胜。
+              这不是说主动管理一无是处，而是说明：<strong>长期稳定地跑赢市场，极其困难</strong>。
+            </p>
+            <div class="concept__analogy">
+              主动基金经理像开车抄近路的人：有人真的更快，但你坐在车上，事先不知道他是不是认路。
+              指数基金像坐公交：不快，但路线透明、票价便宜，长期大概率能到目的地。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--gold" style="margin-top: var(--space-5);">
+          <div class="card__title">那主动基金还有价值吗？</div>
+          <p style="margin-bottom:0;">
+            有，但前提是你有能力选出真正优秀的 manager，并且能承受它跑输指数的年份。
+            对大多数零基础投资者，更现实的做法是：<strong>用低成本指数基金打底</strong>，
+            把精力放在资产配置（第 20 章）和长期坚持上，而不是追逐每年的冠军基金。
+          </p>
+        </div>
+      </section>
+
+      <!-- 核心概念四 -->
+      <section class="section" id="fees">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">费率结构：哪些钱是每年都在付的</h2>
+
+        <p>
+          基金的费用名目不少，但可以分成两类：<strong>一次性费用</strong>和
+          <strong>每年从基金资产里扣的费用</strong>。后者才是长期影响最大的。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">管理费：每年按资产规模计提</div>
+            <p style="margin-bottom:0;">
+              股票型基金常见 1%–1.5%，指数基金 0.15%–0.5%，债券基金更低。
+              它按日从基金资产里扣，你看到的净值已经是扣完管理费之后的。
+              <strong>不管基金涨还是跌，这笔钱都照收。</strong>
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">托管费：付给托管银行的保管费</div>
+            <p style="margin-bottom:0;">
+              通常每年 0.05%–0.25%，同样从基金资产里扣。它买的是「钱不会被挪用」的制度保障。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">申购费与赎回费：进出的门票</div>
+            <p style="margin-bottom:0;">
+              申购费是买入时一次性收取，常见 1.5% 左右，但很多平台打一折；
+              赎回费是卖出时收取，<strong>持有时间越短越高</strong>，通常持有 2–3 年以上降为 0。
+              这是在用费率惩罚短线交易。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">销售服务费：C 类份额的「年费」</div>
+            <p style="margin-bottom:0;">
+              同一只基金常有 A 类和 C 类。A 类收一次性申购费，不收销售服务费；
+              C 类不收申购费，但每年收 0.2%–0.8% 的销售服务费。
+              <strong>打算长期持有，A 类通常更划算；打算短期持有，C 类更划算。</strong>
+            </p>
+            <div class="concept__analogy">
+              管理费像物业费，每年都收，不管房子涨不涨；申购费像进小区的一次性门禁卡费。
+              物业费看起来不多，但住 20 年，总额可能超过你的想象。
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          还有一类容易被忽略的<strong>隐性成本</strong>：基金买卖股票时付的佣金、大额交易对股价的冲击、
+          高换手带来的摩擦。这些不会单独列在费率表里，但会体现在净值中。
+          所以看基金成本，不能只看「管理费」三个字，还要看换手率和综合费率。
+        </p>
+
+        <div class="card card--info" style="margin-top: var(--space-5);">
+          <div class="card__title">ETF 与 LOF：两个常见的「特殊形态」</div>
+          <p>
+            <strong>ETF</strong>（交易所交易基金）像股票一样在交易所盘中买卖，价格实时变动，
+            通常跟踪指数、费率低，适合想自己控制买卖时点的人。
+          </p>
+          <p style="margin-bottom:0;">
+            <strong>LOF</strong>（上市开放式基金）既可以在场外按净值申购赎回，也可以在交易所买卖。
+            它可能是指数基金，也可能是主动基金。两者都可能出现「交易价格」和「净值」不一致的折溢价，
+            买卖前要留意。
+          </p>
+        </div>
+      </section>
+
+      <!-- 交互 -->
+      <section class="section" id="lab">
+        <div class="section__label">动手算一算</div>
+        <h2 class="section__title">费率 1%，20 年后差多少？</h2>
+
+        <p>
+          下面假设两只基金的底层资产毛收益都是每年 8%，本金 10 万元，
+          唯一区别是综合费率：<strong>0.5%</strong> 与 <strong>1.5%</strong>。
+          切换年限，看看差距怎么随复利放大。
+        </p>
+
+        <div class="fund-lab">
+          <div class="fund-lab__head">
+            <div class="fund-lab__title">10 万元本金 · 毛收益 8% / 年</div>
+            <div class="fund-switch" id="fund-switch">
+              <button type="button" data-years="10">10 年</button>
+              <button type="button" data-years="20" class="is-active">20 年</button>
+              <button type="button" data-years="30">30 年</button>
+            </div>
+          </div>
+
+          <div class="fund-legend">
+            <span><i class="fund-dot fund-dot--low"></i>低费率基金 0.5%（净 7.5%）</span>
+            <span><i class="fund-dot fund-dot--high"></i>高费率基金 1.5%（净 6.5%）</span>
+          </div>
+
+          <div class="fund-chart" id="fund-chart" aria-label="两只基金逐年净值柱状对比"></div>
+
+          <div class="fund-readout">
+            <div class="fund-stat fund-stat--low">
+              <b><span id="fund-low">42.48</span> 万</b>
+              <small>低费率基金期末资产</small>
+            </div>
+            <div class="fund-stat">
+              <b><span id="fund-high">35.24</span> 万</b>
+              <small>高费率基金期末资产</small>
+            </div>
+            <div class="fund-stat">
+              <b><span id="fund-gap">7.24</span> 万</b>
+              <small>差额（<span id="fund-gap-pct">17.0</span>%）</small>
+            </div>
+          </div>
+
+          <div class="fund-note" id="fund-note"></div>
+        </div>
+
+        <p style="color: var(--ink-500); font-size: 0.92rem;">
+          注意：这里假设两人买到的<strong>毛收益完全相同</strong>。现实中主动基金可能跑赢，也可能跑输。
+          这个实验想说明的不是「主动基金一定差」，而是：<strong>费率差是每年确定发生的，
+          而超额收益不是。</strong>
+        </p>
+      </section>
+
+      <!-- 误区 -->
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">过去业绩好，未来一定也好</div>
+            <div class="myth__right">
+              业绩的持续性很弱。短期冠军往往是因为押中了某个风格或行业，风格反转就会大幅回撤。
+              买基金要看策略是否稳定、费率是否合理、基金经理是否经历过完整周期，
+              而不是只看排行榜上的近一年收益。
+            </div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">基金是专家管的，稳赚不赔</div>
+            <div class="myth__right">
+              基金不保本，净值每天随底层资产波动。股票型基金在熊市里可能跌 30% 以上，
+              即使是债券基金也可能因为利率上升或信用违约而亏损。
+              「专家管理」降低的是操作失误，不是市场风险。
+            </div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">费率差 1% 无所谓，收益才重要</div>
+            <div class="myth__right">
+              1% 是每年从资产里扣的确定成本。20 年复利下，终值相差约 17%；
+              30 年差距更大。收益不确定，费率确定——所以在收益相同的前提下，
+              低成本本身就是一种优势。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <!-- 术语卡 -->
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">基金<span class="glossary__en">Fund</span></div>
+            <div class="glossary__def">把众多投资者的钱集合起来，按统一策略投资一篮子资产的工具。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">基金净值<span class="glossary__en">NAV</span></div>
+            <div class="glossary__def">基金总资产减去负债后，除以总份额，得到每一份基金的价值。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">公募基金<span class="glossary__en">Public Fund</span></div>
+            <div class="glossary__def">向公众公开募集、门槛低、监管严格、信息披露透明的基金。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">私募基金<span class="glossary__en">Private Fund</span></div>
+            <div class="glossary__def">只向合格投资者募集、门槛高、策略灵活但流动性较差的基金。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">指数基金<span class="glossary__en">Index Fund</span></div>
+            <div class="glossary__def">以复制某个指数为目标、不主动选股的被动型基金，费率通常较低。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">主动管理<span class="glossary__en">Active Management</span></div>
+            <div class="glossary__def">基金经理通过研究、选股和择时，试图跑赢业绩基准的投资方式。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">管理费<span class="glossary__en">Management Fee</span></div>
+            <div class="glossary__def">按基金资产规模每日计提、支付给基金管理人的费用，与涨跌无关。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">ETF<span class="glossary__en">Exchange Traded Fund</span></div>
+            <div class="glossary__def">在交易所像股票一样盘中买卖、通常跟踪指数的基金，费率较低。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 下一章 -->
+      <section class="section">
+        <a class="next-chapter" href="../12-derivatives/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 12 章</div>
+            <div class="next-chapter__title">衍生品：期货与期权</div>
+          </div>
+          <span class="next-chapter__link">继续学习 →</span>
+        </a>
+      </section>
+
+      <!-- 完成 -->
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 基金费率对比 ---------- */
+    const PRINCIPAL = 10;          /* 万元 */
+    const GROSS_RETURN = 0.08;     /* 毛收益 */
+    const FEE_LOW = 0.005;
+    const FEE_HIGH = 0.015;
+
+    const chartEl = document.getElementById('fund-chart');
+    const switchEl = document.getElementById('fund-switch');
+    const lowEl = document.getElementById('fund-low');
+    const highEl = document.getElementById('fund-high');
+    const gapEl = document.getElementById('fund-gap');
+    const gapPctEl = document.getElementById('fund-gap-pct');
+    const noteEl = document.getElementById('fund-note');
+
+    let fundYears = 20;
+
+    function valueAt(years, fee) {
+      return PRINCIPAL * Math.pow(1 + GROSS_RETURN - fee, years);
+    }
+
+    function renderFund(years) {
+      fundYears = years;
+      const lowEnd = valueAt(years, FEE_LOW);
+      const highEnd = valueAt(years, FEE_HIGH);
+      const maxValue = lowEnd * 1.04; /* 留一点顶部空间 */
+      const gap = lowEnd - highEnd;
+      const gapPct = (gap / lowEnd) * 100;
+
+      const parts = [];
+      for (let y = 1; y <= years; y += 1) {
+        const low = valueAt(y, FEE_LOW);
+        const high = valueAt(y, FEE_HIGH);
+        const lowH = (low / maxValue) * 100;
+        const highH = (high / maxValue) * 100;
+        const showLabel = (y === 1 || y === years || y % 5 === 0);
+        const title = '第 ' + y + ' 年：低费率 ' + low.toFixed(2) + ' 万 / 高费率 ' + high.toFixed(2) + ' 万';
+        parts.push(
+          '<div class="fund-year" title="' + title + '">' +
+            '<div class="fund-year__bars">' +
+              '<div class="fund-bar fund-bar--low" style="height:' + lowH.toFixed(2) + '%"></div>' +
+              '<div class="fund-bar fund-bar--high" style="height:' + highH.toFixed(2) + '%"></div>' +
+            '</div>' +
+            '<div class="fund-year__label">' + (showLabel ? y : '') + '</div>' +
+          '</div>'
+        );
+      }
+      chartEl.innerHTML = parts.join('');
+
+      lowEl.textContent = lowEnd.toFixed(2);
+      highEl.textContent = highEnd.toFixed(2);
+      gapEl.textContent = gap.toFixed(2);
+      gapPctEl.textContent = gapPct.toFixed(1);
+
+      noteEl.innerHTML = '持有 <strong>' + years + ' 年</strong>后，高费率基金比低费率基金少 '
+        + gap.toFixed(2) + ' 万元，相当于少 <strong>' + gapPct.toFixed(1) + '%</strong>。'
+        + ' 这个差额不是一次性收费造成的，而是每年 1% 的费率在复利下逐年累积的结果。';
+    }
+
+    switchEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-years]');
+      if (!btn) return;
+      switchEl.querySelectorAll('button').forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      renderFund(parseInt(btn.dataset.years, 10));
+    });
+
+    renderFund(20);
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '基金托管人（通常是银行）的核心作用是？',
+        options: [
+          '帮基金经理选股',
+          '保管基金资产，监督资金不被管理人挪用',
+          '保证基金收益',
+          '决定基金的管理费率'
+        ],
+        answer: 1,
+        explain: '托管人负责保管基金资产、核对交易指令、监督投资范围。钱不在基金公司手里，这是防止挪用和利益输送的关键制度。'
+      },
+      {
+        question: '把所有主动基金作为一个整体看，扣除费用后，它们的平均收益通常会？',
+        options: [
+          '高于市场平均',
+          '等于市场平均',
+          '低于市场平均',
+          '无法比较'
+        ],
+        answer: 2,
+        explain: '所有投资者的加权平均就是市场本身。扣掉费用后，整体平均必然低于市场平均。有人跑赢，就有人跑输，但赢家事前难以确定。'
+      },
+      {
+        question: '你打算持有一只基金 5 年以上，通常哪类份额更划算？',
+        options: [
+          'A 类，收一次性申购费，不收销售服务费',
+          'C 类，不收申购费，但每年收销售服务费',
+          '两类完全一样',
+          '应该每天申赎一次'
+        ],
+        answer: 0,
+        explain: 'C 类的销售服务费每年都收，持有越久累计越多；长期持有通常 A 类的一次性申购费更划算。短期持有则相反。'
+      },
+      {
+        question: '年化毛收益 8%，费率从 0.5% 升到 1.5%，20 年后终值大约少多少？',
+        options: ['不到 1%', '约 5%', '约 17%', '约 50%'],
+        answer: 2,
+        explain: '净收益从 7.5% 降到 6.5%，20 年复利后终值约为原来的 82.9%，也就是少了约 17%。费率差会被复利放大。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch11');
+  </script>
+</body>
+</html>

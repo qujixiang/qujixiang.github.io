@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 1 章 · 钱是什么 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <!-- 侧边目录 -->
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：战俘营里的香烟</a>
+        <a class="sidebar__link" href="#functions">货币的三大职能</a>
+        <a class="sidebar__link" href="#evolution">从贝壳到信用货币</a>
+        <a class="sidebar__link" href="#m0m1m2">M0、M1、M2</a>
+        <a class="sidebar__link" href="#liquidity">房子算钱吗</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块一 · 金融直觉</div>
+        <h1 class="hero__title">钱是什么</h1>
+        <p class="hero__lead">
+          你可能每天都在用钱，但很少想过：为什么一张纸、一串数字，就能换到别人辛苦做出来的东西？
+        </p>
+      </header>
+
+      <!-- 本章目标 -->
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>说清楚货币的三大职能，以及为什么缺一不可</span></li>
+          <li><span class="goal-list__check">2</span><span>解释「为什么纸币本身不值钱，却能买东西」</span></li>
+          <li><span class="goal-list__check">3</span><span>分清 M0、M1、M2 三种货币供应量口径，以及资产和货币的区别</span></li>
+        </ul>
+      </section>
+
+      <!-- 开场故事 -->
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">战俘营里的香烟</h2>
+
+        <div class="story">
+          <div class="story__label">真实事件 · 二战战俘营</div>
+          <p>
+            二战期间，关押英国战俘的营地里，红十字会会定期寄来包裹。包裹里有面包、罐头，还有香烟。
+          </p>
+          <p>
+            很快，一件奇怪的事情发生了：<strong>香烟变成了整个营地的事实货币</strong>。面包可以用几根香烟换，
+            理发可以用两根香烟付，有人开始「存烟」，甚至出现了「借烟」的行为——借 10 根，下个月还 11 根。
+          </p>
+          <p>
+            更微妙的是：如果香烟受潮发霉、品质变差，整个营地的物价就会上涨——
+            这已经是一次完整的<strong>通货膨胀</strong>了。
+          </p>
+          <div class="story__question">
+            没有人规定香烟是钱，也没有政府强制大家使用。为什么它会自己变成货币？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          答案藏在香烟的几个特点里：大家都想要它、可以拆成半根、相对耐存放、每根大小差不多。
+          这四个特点，正好对应了「什么能当货币」的条件。
+        </p>
+      </section>
+
+      <!-- 三大职能 -->
+      <section class="section" id="functions">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">货币的三大职能</h2>
+
+        <p>经济学家把货币的作用总结成三条。注意：<strong>这三条必须同时满足</strong>，缺一个就不算完整的货币。</p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 交易媒介（Medium of Exchange）</div>
+            <p style="margin-bottom:0;">
+              解决「我想要你的面包，但你不需要我的鞋」的尴尬。有了货币，你先把鞋换成钱，再用钱买面包，
+              不需要刚好找到一个「既想要鞋又有面包」的人。
+            </p>
+            <div class="concept__analogy">
+              货币就像语言里的通用词。没有通用词，你得靠比划；有了通用词，谁都能跟谁沟通。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 计价单位（Unit of Account）</div>
+            <p style="margin-bottom:0;">
+              所有商品都用同一把尺子标价。如果每个东西都用别的商品标价，你会得到一张天文数字般的兑换表：
+              1 个面包 = 2 个鸡蛋 = 0.3 双鞋 = 1/5 把椅子……
+            </p>
+            <div class="concept__analogy">
+              就像温度用摄氏度、长度用米。没有统一单位，每次比较都要重新换算。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 价值储藏（Store of Value）</div>
+            <p style="margin-bottom:0;">
+              把今天的购买力存起来，留到以后用。你今天卖面包收到钱，可以下个月再花。
+              这也是通货膨胀最伤人的地方：储藏功能被悄悄削弱了。
+            </p>
+            <div class="concept__analogy">
+              像一个仓库。仓库本身不生产东西，但它让东西可以「跨时间」使用。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--gold" style="margin-top: var(--space-5);">
+          <div class="card__title">为什么这三条缺一不可？</div>
+          <p style="margin-bottom:0;">
+            如果一样东西能交易但不能储藏（比如生鲜），你不会愿意用它存钱；
+            如果它能储藏但不能拆分交易（比如房子），它没法给一根葱标价。
+            <strong>三条同时成立，它才是货币。</strong>
+          </p>
+        </div>
+      </section>
+
+      <!-- 货币演化 -->
+      <section class="section" id="evolution">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">从贝壳到信用货币</h2>
+
+        <p>货币的形态一直在变，但背后的逻辑只有一条：<strong>从「本身值钱」变成「大家相信它值钱」</strong>。</p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">第一阶段：商品货币</div>
+            <p style="margin-bottom:0;">
+              贝壳、盐、牲畜、烟草。它们本身就是有用的东西，所以大家都愿意收。
+              缺点是：不好分割、不好携带、品质不统一。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">第二阶段：金属货币</div>
+            <p style="margin-bottom:0;">
+              金银解决了上面的问题：稀缺、可分割、不易腐蚀、标准化。中国用铜钱，欧洲用金银币，
+              一用就是两千年。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">第三阶段：纸币（兑换券）</div>
+            <p style="margin-bottom:0;">
+              最早的纸币是「存款凭证」——你把一笔金属货币存进钱庄，钱庄给你一张纸，
+              凭纸可以取回这笔钱。这时候纸币只是<strong>金属货币的替身</strong>。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">第四阶段：信用货币（Fiat Money）</div>
+            <p style="margin-bottom:0;">
+              1971 年，美元与黄金脱钩，主要经济体的货币陆续进入「纯信用货币」时代。今天的纸币不能兑换黄金，
+              它的价值来自两件事：<strong>国家法律规定它必须被接受</strong>，以及<strong>大家相信它不会突然变得一文不值</strong>。
+            </p>
+            <div class="concept__analogy">
+              像一张所有人都认的欠条。它本身不值钱，但只要有足够多的人相信别人也会接受它，它就能流通。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--info" style="margin-top: var(--space-5);">
+          <div class="card__title">一个反直觉的事实</div>
+          <p style="margin-bottom:0;">
+            你手机银行里的「余额」，本质上是<strong>商业银行欠你的钱</strong>——是银行的负债。
+            如果银行倒闭，这笔钱本来会消失，所以才有存款保险制度（我们会在第 8 章讲）。
+          </p>
+        </div>
+      </section>
+
+      <!-- M0 M1 M2 -->
+      <section class="section" id="m0m1m2">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">M0、M1、M2：钱的三种口径</h2>
+
+        <p>
+          新闻里常说「M2 增速」「M1-M2 剪刀差」。为什么钱要分好几种？
+          因为<strong>不同类型的钱，活跃程度不一样</strong>。
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">M0</div>
+            <div class="compare__label">流通中的现金<br>最活跃</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">M1</div>
+            <div class="compare__label">M0 + 活期存款<br>随时能花</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">M2</div>
+            <div class="compare__label">M1 + 定期存款、货币基金等<br>准货币</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__title">怎么理解这三层</div>
+          <p>
+            把 M0 想成你<strong>口袋里的现金</strong>；M1 是你<strong>银行卡里随时能刷的钱</strong>；
+            M2 再加上你<strong>存了定期、买了货币基金的钱</strong>——这些钱暂时不动，但随时可以变成 M1。
+          </p>
+          <p style="margin-bottom:0;">
+            所以 M2 增长快，可能说明大家更愿意存钱、不愿意花钱；M1 增长快，通常说明消费和投资更活跃。
+            这就是「M1-M2 剪刀差」被当作经济晴雨表的原因。
+          </p>
+        </div>
+
+        <div class="story" style="margin-top: var(--space-5);">
+          <div class="story__label">一个容易混淆的点</div>
+          <p style="margin-bottom:0;">
+            M2 里的「货币基金」并不在你银行卡余额里显示，但你今天赎回、明天就能用。
+            它算钱，只是算「不那么活跃的钱」。
+          </p>
+        </div>
+      </section>
+
+      <!-- 流动性交互 -->
+      <section class="section" id="liquidity">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">房子算钱吗？先理解「流动性」</h2>
+
+        <p>
+          很多人觉得「我有套房，所以我有钱」。这句话对一半：房子是<strong>资产</strong>，但不是<strong>货币</strong>。
+          区别就在流动性——<strong>多快能变成现金，而且不损失价值</strong>。
+        </p>
+
+        <div class="liquidity">
+          <div class="liquidity__track" id="liquidity-track">
+            <button class="liquidity__item" data-key="cash">现金</button>
+            <button class="liquidity__item" data-key="demand">活期存款</button>
+            <button class="liquidity__item" data-key="fund">货币基金</button>
+            <button class="liquidity__item" data-key="stock">股票</button>
+            <button class="liquidity__item" data-key="house">房子</button>
+            <button class="liquidity__item" data-key="antique">古董</button>
+          </div>
+          <div class="liquidity__detail" id="liquidity-detail">
+            <span class="liquidity__hint">点一个资产，看它变成现金需要多久。</span>
+          </div>
+        </div>
+
+        <p>
+          从左到右，变现越来越慢、折价风险越来越大。所以「有钱」和「有资产」是两回事：
+          一个身家千万但全是房产的人，可能连 5 万现金都拿不出来。
+        </p>
+      </section>
+
+      <!-- 误区 -->
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">钱本身有价值</div>
+            <div class="myth__right">现代货币是信用货币，本身几乎不值钱，价值来自国家信用和普遍接受。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">只有现金才是钱</div>
+            <div class="myth__right">活期、定期、货币基金都算货币供应量的一部分，只是活跃程度不同。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">房子就是钱，随时能变现</div>
+            <div class="myth__right">房子是资产，流动性差。急售往往要折价，变现周期可能几个月。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <!-- 术语卡 -->
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">货币<span class="glossary__en">Money</span></div>
+            <div class="glossary__def">被普遍接受、可用于交易和储值的媒介。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">交易媒介<span class="glossary__en">Medium of Exchange</span></div>
+            <div class="glossary__def">用来间接交换商品，避免「双重巧合」的困境。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">计价单位<span class="glossary__en">Unit of Account</span></div>
+            <div class="glossary__def">给所有商品标价的统一尺度。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">价值储藏<span class="glossary__en">Store of Value</span></div>
+            <div class="glossary__def">把购买力从今天转移到未来。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">信用货币<span class="glossary__en">Fiat Money</span></div>
+            <div class="glossary__def">不能兑换黄金、价值来自国家信用的货币。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">流动性<span class="glossary__en">Liquidity</span></div>
+            <div class="glossary__def">资产变成现金的速度，以及变现时的折价程度。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">M1 / M2<span class="glossary__en">Money Supply</span></div>
+            <div class="glossary__def">按活跃程度划分的货币供应量口径。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">商品货币<span class="glossary__en">Commodity Money</span></div>
+            <div class="glossary__def">本身有使用价值的货币，如金银、贝壳、香烟。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 下一章 -->
+      <section class="section">
+        <a class="next-chapter" href="../02-time-value/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 2 章</div>
+            <div class="next-chapter__title">时间价值：今天的 100 块 ≠ 明年的 100 块</div>
+          </div>
+          <span class="next-chapter__link">继续学习 →</span>
+        </a>
+      </section>
+
+      <!-- 完成 -->
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 流动性交互 ---------- */
+    const LIQUIDITY = {
+      cash:    { name: '现金',      speed: '立刻',   loss: '无',       note: '流动性最高的资产。但长期持有会被通胀侵蚀购买力。' },
+      demand:  { name: '活期存款',  speed: '立刻',   loss: '无',       note: '随时可取，受存款保险保护。利率很低，通常跑不赢通胀。' },
+      fund:    { name: '货币基金',  speed: '1 天',   loss: '几乎无',   note: '赎回后 T+1（下一个交易日）到账，收益略高于活期，风险很低。' },
+      stock:   { name: '股票',      speed: '1–2 天', loss: '可能有',   note: '卖出很快，但价格时刻波动。急用钱时可能正好赶上低点。' },
+      house:   { name: '房子',      speed: '1–6 个月', loss: '通常有', note: '交易周期长，急售往往要折价 5%–20%。它是资产，不是货币。' },
+      antique: { name: '古董',      speed: '数月到数年', loss: '很大',  note: '需要找到愿意出价的买家，估值主观，变现折价最大。' }
+    };
+
+    const track = document.getElementById('liquidity-track');
+    const detail = document.getElementById('liquidity-detail');
+    track.addEventListener('click', (e) => {
+      const btn = e.target.closest('.liquidity__item');
+      if (!btn) return;
+      track.querySelectorAll('.liquidity__item').forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const item = LIQUIDITY[btn.dataset.key];
+      detail.innerHTML = `
+        <div class="card__title">${item.name}</div>
+        <p style="margin-bottom: var(--space-2);">
+          <strong>变现速度：</strong>${item.speed}
+          <strong>折价风险：</strong>${item.loss}
+        </p>
+        <p style="margin-bottom:0; color: var(--ink-500); font-size:.92rem;">${item.note}</p>
+      `;
+    });
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '战俘营里的香烟能成为货币，最核心的原因是？',
+        options: [
+          '红十字会规定了香烟可以交易',
+          '香烟同时满足交易媒介、计价单位、价值储藏三个条件',
+          '香烟比面包更值钱',
+          '战俘们没有别的选择'
+        ],
+        answer: 1,
+        explain: '货币自发出现，靠的是它被普遍接受、可分割、耐储存——正好对应三大职能。'
+      },
+      {
+        question: '下列哪一项不属于货币的三大职能？',
+        options: [
+          '交易媒介',
+          '计价单位',
+          '价值储藏',
+          '财富增值'
+        ],
+        answer: 3,
+        explain: '货币能储藏价值，但不负责让财富增值。增值要靠投资，那是另一回事。'
+      },
+      {
+        question: 'M2 相比 M1，多了什么？',
+        options: [
+          '流通中的现金',
+          '活期存款',
+          '定期存款、货币基金等准货币',
+          '外汇储备'
+        ],
+        answer: 2,
+        explain: 'M2 = M1 + 定期存款 + 货币基金等。它包含「暂时不动、但能较快变成现金」的钱。'
+      },
+      {
+        question: '关于「房子算不算钱」，最准确的说法是？',
+        options: [
+          '算，房子能卖很多钱',
+          '不算，房子是资产，但流动性差，不能直接当货币使用',
+          '不算，因为房子不能交易',
+          '算，只要房产证能抵押'
+        ],
+        answer: 1,
+        explain: '房子是资产，不是货币。区别在于流动性：变现慢、可能折价，无法直接用于日常交易。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch01');
+  </script>
+</body>
+</html>

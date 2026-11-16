@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 2 章 · 时间价值：今天的 100 块 ≠ 明年的 100 块 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    .data-table { width: 100%; border-collapse: collapse; margin: var(--space-4) 0; font-size: .95rem; }
+    .data-table th, .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--ink-100); text-align: right; }
+    .data-table th:first-child, .data-table td:first-child { text-align: left; }
+    .data-table thead th { color: var(--ink-500); font-weight: 600; font-size: 13px; border-bottom: 2px solid var(--ink-100); }
+    .data-table td { font-variant-numeric: tabular-nums; }
+    .data-table .is-highlight { color: var(--gold-600); font-weight: 700; }
+
+    .calc__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--space-3); }
+    .calc__field { display: flex; flex-direction: column; gap: 6px; }
+    .calc__label { font-size: 13px; color: var(--ink-500); font-weight: 600; }
+    .calc__input, .calc__select {
+      width: 100%;
+      font: inherit;
+      font-size: 15px;
+      padding: 8px 12px;
+      color: var(--ink-900);
+      background: #fff;
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-sm);
+    }
+    .calc__input:focus, .calc__select:focus {
+      outline: 2px solid var(--gold-300);
+      outline-offset: 1px;
+      border-color: var(--gold-300);
+    }
+    .calc__note { margin: var(--space-3) 0 0; font-size: 13px; color: var(--ink-300); }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <!-- 侧边目录 -->
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：还你 10 万，为什么还是亏了</a>
+        <a class="sidebar__link" href="#interest">利息的本质</a>
+        <a class="sidebar__link" href="#compound">单利与复利</a>
+        <a class="sidebar__link" href="#rule72">72 法则</a>
+        <a class="sidebar__link" href="#discount">贴现：未来的钱值多少</a>
+        <a class="sidebar__link" href="#calculator">复利计算器</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块一 · 金融直觉</div>
+        <h1 class="hero__title">时间价值：今天的 100 块 ≠ 明年的 100 块</h1>
+        <p class="hero__lead">
+          同样是一百块，今天拿到和一年后拿到，价值并不一样。这不是感觉，而是可以算出来的。
+        </p>
+      </header>
+
+      <!-- 本章目标 -->
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>说清楚利息由哪三部分组成，不再把利息简单当成「银行的规定」</span></li>
+          <li><span class="goal-list__check">2</span><span>用单利和复利算出同一笔钱在不同年限后的差距，并用 72 法则心算翻倍时间</span></li>
+          <li><span class="goal-list__check">3</span><span>把未来的钱「折回今天」，判断一笔钱到底值不值得等</span></li>
+        </ul>
+      </section>
+
+      <!-- 开场故事 -->
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">还你 10 万，为什么还是亏了</h2>
+
+        <div class="story">
+          <div class="story__label">一个常见场景</div>
+          <p>
+            大学同学找你借 10 万，说好一年后还。一年后，他准时把 10 万转了回来，
+            还特意发了一句：「一分不少，够意思吧。」
+          </p>
+          <p>
+            你看着余额，数字确实回到了原点，好像什么也没发生。但这一年里，
+            你的 10 万如果放在银行，按 2% 的定存利率，能多拿 2000 块；
+            而这一年物价涨了 3%，一年后的 10 万，只相当于今天的 <strong>9.7 万</strong>。
+          </p>
+          <p>
+            更别说，这一年里他如果还不上，你要承担全部后果。
+            你没有收他一分钱，却替他承担了时间、通胀和违约三种成本。
+          </p>
+          <div class="story__question">
+            钱数一模一样，为什么你其实亏了至少 5000 块？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          因为钱的价值不是由「数字」决定的，而是由<strong>它能在什么时候、以多确定的程度、买到多少东西</strong>决定的。
+          今天的一百块可以立刻花掉，也可以存起来生息；明年的一百块，这两件事都做不到。
+          这个差别，就是<strong>时间价值</strong>。
+        </p>
+      </section>
+
+      <!-- 利息的本质 -->
+      <section class="section" id="interest">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">利息的本质：三笔钱叠在一起</h2>
+
+        <p>
+          很多人以为利息是银行「定」出来的。其实利率是一个价格，
+          它由三部分成本叠加而成。看懂这三块，你就能判断一个利率是正常还是离谱。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 延迟消费的补偿</div>
+            <p style="margin-bottom:0;">
+              人天生更愿意现在消费，而不是以后。你把钱借出去，等于放弃了现在的享受和选择权，
+              对方必须给你一点补偿，你才愿意等。这部分通常对应「无风险利率」，
+              可以粗略理解为国债收益率或优质银行的存款利率。
+            </p>
+            <div class="concept__analogy">
+              像把房子租给别人住。房子还是你的，但这一年你住不了，租金就是对你「让出使用权」的补偿。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 违约风险的补偿</div>
+            <p style="margin-bottom:0;">
+              借给国家，几乎不用担心不还；借给一家小公司，就要担心它倒闭。
+              信用越差，要求的利率越高。这部分叫「信用风险溢价」。
+              民间借贷、网贷利率高，很大一块就来自这里。
+            </p>
+            <div class="concept__analogy">
+              像把相机借给陌生人。你可能要收押金，或者要求多付一点「万一弄坏」的钱。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 通胀预期的补偿</div>
+            <p style="margin-bottom:0;">
+              如果物价每年涨 3%，对方一年后还你本金，这 100 块的购买力已经缩水了。
+              所以名义利率里必须包含对通胀的预期，否则没人愿意借。
+              扣掉通胀之后剩下的，才是你真正的「实际收益」。
+            </p>
+            <div class="concept__analogy">
+              像借出一箱水果，还回来时得补上「路上会烂掉的那部分」，否则你等于白借。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--gold" style="margin-top: var(--space-5);">
+          <div class="card__title">一个拆解示例</div>
+          <p style="margin-bottom:0;">
+            假设某银行五年期贷款利率是 6%。它可以粗略拆成：资金成本约 2.5%（无风险利率，覆盖延迟消费和通胀补偿）
+            + 违约风险约 1.5% + 银行运营成本和利润约 2%。
+            <strong>如果有人说「保本，年化 18%」，你可以反推：比 2.5% 左右的资金成本多出来的 15 个百分点以上，对应的是什么风险？</strong>
+            如果对方说不出，那这笔钱大概率不是来自实体经济的利息。
+          </p>
+        </div>
+      </section>
+
+      <!-- 单利与复利 -->
+      <section class="section" id="compound">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">单利与复利：时间站在哪一边</h2>
+
+        <p>
+          单利只对本金计息；复利把每一年产生的利息也加进本金，下一年连利息一起生息。
+          差别听起来很小，但拉长时间，会变成两个世界。
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">P × (1 + r × n)</div>
+            <div class="compare__label">单利终值<br>只有本金生息</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">P × (1 + r)<sup>n</sup></div>
+            <div class="compare__label">复利终值<br>利息也生息</div>
+          </div>
+        </div>
+
+        <p>
+          以 10 万元本金、8% 年利率为例，两种算法在 10 年时差距还不算大，
+          到 30 年、40 年，差距会大到让人怀疑算错了。
+        </p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>年限</th>
+              <th>单利终值</th>
+              <th>复利终值</th>
+              <th>差距</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>10 年</td>
+              <td>18.0 万</td>
+              <td>21.6 万</td>
+              <td>3.6 万</td>
+            </tr>
+            <tr>
+              <td>20 年</td>
+              <td>26.0 万</td>
+              <td>46.6 万</td>
+              <td>20.6 万</td>
+            </tr>
+            <tr>
+              <td>30 年</td>
+              <td>34.0 万</td>
+              <td class="is-highlight">100.6 万</td>
+              <td>66.6 万</td>
+            </tr>
+            <tr>
+              <td>40 年</td>
+              <td>42.0 万</td>
+              <td class="is-highlight">217.2 万</td>
+              <td>175.2 万</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          30 年时，复利终值是单利的近 3 倍；40 年时，是 5 倍多。
+          <strong>本金和利率决定你跑多快，时间决定你跑多远。</strong>
+          这也是为什么「早点开始」比「找到更高一点的收益率」往往更重要。
+        </p>
+
+        <p>
+          复利有三个要素：本金、收益率、时间。本金可以靠收入慢慢积累，收益率受市场制约，
+          只有时间是每个人都公平拥有、且无法追回的。举个具体的例子：25 岁开始每年存 1 万，
+          按 6% 复利到 60 岁，大约能积累 111 万；35 岁才开始，同样存到 60 岁，大约只有 55 万。
+          晚开始十年，少存 10 万，最终却少了 56 万——差距主要不是来自你多存的钱，
+          而是来自那十年里「利息继续生息」的机会。
+        </p>
+        <p>
+          这也解释了一个常见的困惑：为什么同样一笔钱，放在不同的时间点，结果差那么多？
+          因为复利不是线性的，它是一条越来越陡的曲线。前十年看起来慢，后十年才加速。
+          很多人正是在「看起来慢」的阶段放弃，错过了后面那段加速。
+        </p>
+
+        <div class="card card--info">
+          <div class="card__title">复利也有反向的一面</div>
+          <p style="margin-bottom:0;">
+            复利不只会帮你，也会帮你对面的那个人。信用卡分期、消费贷、校园贷，
+            收的都是复利或接近复利的成本。你欠的钱会像滚雪球一样变大，
+            而且越快还不上，滚得越快。<strong>同一个公式，站在哪一边，结果完全相反。</strong>
+          </p>
+        </div>
+
+        <p>
+          还有一个容易被忽略的点：复利对「中断」和「费用」非常敏感。
+          如果你中途取出一部分，或者每年被扣掉 1%–2% 的管理费，
+          看起来不多，但被扣掉的钱原本也会继续生息，几十年后是一笔很大的数字。
+          第 11 章讲基金费率时，我们会再算一次这笔账。
+        </p>
+      </section>
+
+      <!-- 72 法则 -->
+      <section class="section" id="rule72">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">72 法则：多久能翻倍</h2>
+
+        <p>
+          复利公式精确，但心算不友好。有一个足够好用的近似方法：
+          <strong>用 72 除以年化收益率，得到大约多少年翻倍。</strong>
+        </p>
+
+        <div class="compare">
+          <div class="compare__item">
+            <div class="compare__value">3%</div>
+            <div class="compare__label">约 24 年翻倍<br>72 ÷ 3 = 24</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">6%</div>
+            <div class="compare__label">约 12 年翻倍<br>72 ÷ 6 = 12</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">8%</div>
+            <div class="compare__label">约 9 年翻倍<br>72 ÷ 8 = 9</div>
+          </div>
+          <div class="compare__item">
+            <div class="compare__value">12%</div>
+            <div class="compare__label">约 6 年翻倍<br>72 ÷ 12 = 6</div>
+          </div>
+        </div>
+
+        <p>
+          这个法则为什么是 72，而不是 100？因为翻倍时间约等于 2 的对数（约 0.693）
+          除以年化收益率；年化收益率通常写成百分数，把 0.693 放大 100 倍约为 69.3，
+          再换成一个便于整除的整数 72，就得到了「72 ÷ 年化收益率（百分数）」这个近似公式。
+          它在 5%–15% 的区间里相当准，超出这个范围误差会变大。
+        </p>
+
+        <p>
+          更有意思的是，72 法则也能用来算<strong>购买力缩水</strong>。
+          如果通胀率是 3%，72 ÷ 3 = 24，意味着大约 24 年后，
+          同样一笔钱的购买力只剩一半。你不需要记住复杂的公式，
+          只要记住这个除法，就能对很多长期问题有一个量级上的判断。
+        </p>
+
+        <div class="story" style="margin-top: var(--space-5);">
+          <div class="story__label">用 72 法则做个判断</div>
+          <p style="margin-bottom:0;">
+            两个选择：A 产品年化 4%，B 产品年化 8%。听起来只差 4 个百分点，
+            但 A 要 18 年翻倍，B 只要 9 年。<strong>收益率的小差距，在时间维度上会被放大成代际差距。</strong>
+            不过别忘了，B 多出来的 4%，通常意味着你要多承担一份风险。
+          </p>
+        </div>
+      </section>
+
+      <!-- 贴现 -->
+      <section class="section" id="discount">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">贴现：未来的钱，折回今天值多少</h2>
+
+        <p>
+          前面是「今天的钱长到未来」，现在反过来：「未来的钱，今天值多少？」
+          这个动作叫<strong>贴现</strong>，公式是：
+        </p>
+
+        <div class="card card--gold">
+          <div class="card__title">现值公式</div>
+          <p style="margin-bottom:0; font-family: var(--font-mono); font-size: 1rem;">
+            PV = FV ÷ (1 + r)<sup>n</sup>
+          </p>
+          <p style="margin: var(--space-2) 0 0; font-size: .92rem; color: var(--ink-500);">
+            PV 是现值，FV 是未来的金额，r 是贴现率，n 是年数。
+          </p>
+        </div>
+
+        <p style="margin-top: var(--space-4);">
+          假设贴现率是 5%：一年后的 100 万，今天值 95.2 万；
+          五年后的 100 万，今天值 78.4 万；十年后的 100 万，今天只值 61.4 万。
+          <strong>同样是一百万，越晚拿到，今天看就越不值钱。</strong>
+        </p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>未来拿到 100 万的时间</th>
+              <th>贴现率 3%</th>
+              <th>贴现率 5%</th>
+              <th>贴现率 8%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1 年后</td>
+              <td>97.1 万</td>
+              <td>95.2 万</td>
+              <td>92.6 万</td>
+            </tr>
+            <tr>
+              <td>5 年后</td>
+              <td>86.3 万</td>
+              <td>78.4 万</td>
+              <td>68.1 万</td>
+            </tr>
+            <tr>
+              <td>10 年后</td>
+              <td>74.4 万</td>
+              <td class="is-highlight">61.4 万</td>
+              <td>46.3 万</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          这张表解释了很多金融现象。利率上升时，未来才会产生的现金流，
+          折回今天会缩水更多，所以<strong>债券价格会跌，成长股跌得尤其厉害</strong>——
+          因为它们的价值大部分来自很远的未来。反过来，利率下降时，
+          这些资产的价格会被推高。
+        </p>
+        <p>
+          贴现也是后面估值的地基。第 16 章讲 DCF（现金流折现），本质上就是把一家公司未来很多年的现金流，
+          一年一年折回今天，再加起来。你现在理解的这个除法，就是那套方法的全部核心。
+        </p>
+        <p>
+          那贴现率应该取多少？它至少要覆盖你的<strong>机会成本</strong>——也就是这笔钱
+          放在同样风险的地方，本来能拿到多少。如果一笔钱只能存 2% 的定存，
+          用 2% 去折现是合理的；如果是一笔风险很高的项目款，就要用更高的贴现率，
+          因为「可能收不到」本身也要计入价格。风险越高，贴现率越高，未来的钱折回今天就越不值钱。
+        </p>
+        <p>
+          这也给了我们一个判断习惯：听到「十年后能赚 100 万」时，不要直接和今天的 100 万比较。
+          先问两个问题——这笔钱有多确定？这十年里我本来能用它做什么？
+          把答案代进贴现公式，你才知道这笔买卖到底划不划算。
+        </p>
+
+        <div class="concept__analogy" style="margin-top: var(--space-4);">
+          未来的钱像远处的灯光，越远看起来越暗。贴现率就是空气的「衰减系数」：利率越高，衰减越快。
+        </div>
+      </section>
+
+      <!-- 复利计算器 -->
+      <section class="section" id="calculator">
+        <div class="section__label">动手算一算</div>
+        <h2 class="section__title">复利计算器</h2>
+
+        <p>
+          改变下面四个数字，看看终值、总利息和翻倍时间怎么变。
+          建议先试一组「10 万、8%、30 年、每年复利」，再把它改成「每月复利」，对比一下差别。
+        </p>
+
+        <div class="card">
+          <div class="calc__grid">
+            <div class="calc__field">
+              <label class="calc__label" for="calc-principal">本金（元）</label>
+              <input class="calc__input" id="calc-principal" type="number" min="0" step="1000" value="100000">
+            </div>
+            <div class="calc__field">
+              <label class="calc__label" for="calc-rate">年利率（%）</label>
+              <input class="calc__input" id="calc-rate" type="number" min="0" max="100" step="0.1" value="8">
+            </div>
+            <div class="calc__field">
+              <label class="calc__label" for="calc-years">年限（年）</label>
+              <input class="calc__input" id="calc-years" type="number" min="0" max="100" step="1" value="30">
+            </div>
+            <div class="calc__field">
+              <label class="calc__label" for="calc-frequency">复利频率</label>
+              <select class="calc__select" id="calc-frequency">
+                <option value="1" selected>每年</option>
+                <option value="2">每半年</option>
+                <option value="4">每季度</option>
+                <option value="12">每月</option>
+                <option value="365">每天</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="compare" style="margin-top: var(--space-5);">
+            <div class="compare__item">
+              <div class="compare__value" id="calc-future">—</div>
+              <div class="compare__label">期末终值</div>
+            </div>
+            <div class="compare__item">
+              <div class="compare__value" id="calc-interest">—</div>
+              <div class="compare__label">总利息</div>
+            </div>
+            <div class="compare__item">
+              <div class="compare__value" id="calc-double">—</div>
+              <div class="compare__label">本金翻倍约需</div>
+            </div>
+          </div>
+
+          <p class="calc__note" id="calc-note"></p>
+        </div>
+
+        <div class="card card--info" style="margin-top: var(--space-4);">
+          <div class="card__title">注意「名义年利率」和「有效年化」不是一回事</div>
+          <p style="margin-bottom:0;">
+            同样的 8%，每月复利一次的有效年化是 8.30%，每天复利是 8.33%。
+            银行在报「年利率」时，可能指的是名义年利率，也可能指有效年化，
+            签合同前要看清计息方式。反过来，如果你在付利息，复利频率越高，你付得越多。
+          </p>
+        </div>
+      </section>
+
+      <!-- 误区 -->
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">复利是「利滚利」的骗局，只有高利贷才用</div>
+            <div class="myth__right">复利只是一个中性的数学事实。存款、国债、基金、养老金都在用它，区别只在于你是收利息的一方，还是付利息的一方。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">利率一样、期限一样，结果就一定一样</div>
+            <div class="myth__right">计息方式会改变结果。按月复利、按季复利、单利计息，最终金额并不相同；「月费率 0.6%」更不能直接乘以 12 当年化。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">钱放着不动最安全</div>
+            <div class="myth__right">不动也在承担成本：通胀让购买力下降，机会成本让你少拿利息。安全与否要看实际购买力，而不是账面数字有没有变少。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <!-- 术语卡 -->
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">时间价值<span class="glossary__en">Time Value</span></div>
+            <div class="glossary__def">同样金额的钱，越早拿到越值钱，因为它可以立即使用或投资生息。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">单利<span class="glossary__en">Simple Interest</span></div>
+            <div class="glossary__def">只对本金计息，利息不再产生新的利息。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">复利<span class="glossary__en">Compound Interest</span></div>
+            <div class="glossary__def">把每期利息加入本金，下一期连利息一起计息。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">终值<span class="glossary__en">Future Value</span></div>
+            <div class="glossary__def">今天的一笔钱，按某个收益率增长到未来某时的金额。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">现值<span class="glossary__en">Present Value</span></div>
+            <div class="glossary__def">未来的一笔钱，按某个贴现率折算回今天的价值。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">贴现率<span class="glossary__en">Discount Rate</span></div>
+            <div class="glossary__def">把未来现金流折回今天时使用的利率（也称折现率），反映资金的机会成本和风险。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">72 法则<span class="glossary__en">Rule of 72</span></div>
+            <div class="glossary__def">用 72 除以年化收益率，估算本金翻倍所需年数的近似方法。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">实际利率<span class="glossary__en">Real Interest Rate</span></div>
+            <div class="glossary__def">名义利率扣除通胀后的利率，衡量购买力真正的增长。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 下一章 -->
+      <section class="section">
+        <a class="next-chapter" href="../03-risk-and-return/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 3 章</div>
+            <div class="next-chapter__title">风险与收益：为什么没有免费的高收益</div>
+          </div>
+          <span class="next-chapter__link">继续学习 →</span>
+        </a>
+      </section>
+
+      <!-- 完成 -->
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 复利计算器 ---------- */
+    const principalEl = document.getElementById('calc-principal');
+    const rateEl = document.getElementById('calc-rate');
+    const yearsEl = document.getElementById('calc-years');
+    const frequencyEl = document.getElementById('calc-frequency');
+    const futureEl = document.getElementById('calc-future');
+    const interestEl = document.getElementById('calc-interest');
+    const doubleEl = document.getElementById('calc-double');
+    const noteEl = document.getElementById('calc-note');
+
+    const money = (value) => '¥' + Math.round(value).toLocaleString('zh-CN');
+
+    function updateCalculator() {
+      const principal = Number(principalEl.value);
+      const annualRate = Number(rateEl.value) / 100;
+      const years = Number(yearsEl.value);
+      const periodsPerYear = Number(frequencyEl.value);
+
+      const valid = Number.isFinite(principal) && principal >= 0 &&
+        Number.isFinite(annualRate) && annualRate >= 0 &&
+        Number.isFinite(years) && years >= 0;
+
+      if (!valid) {
+        futureEl.textContent = '—';
+        interestEl.textContent = '—';
+        doubleEl.textContent = '—';
+        noteEl.textContent = '请输入 0 或正数。';
+        return;
+      }
+
+      const future = principal * Math.pow(1 + annualRate / periodsPerYear, periodsPerYear * years);
+      const interest = future - principal;
+      const effectiveRate = Math.pow(1 + annualRate / periodsPerYear, periodsPerYear) - 1;
+
+      futureEl.textContent = money(future);
+      interestEl.textContent = money(interest);
+
+      if (effectiveRate > 0) {
+        const doubleYears = Math.log(2) / Math.log(1 + effectiveRate);
+        doubleEl.textContent = doubleYears.toFixed(1) + ' 年';
+        noteEl.textContent = '有效年化 ' + (effectiveRate * 100).toFixed(2) +
+          '%；同样条件下单利终值为 ' + money(principal * (1 + annualRate * years)) + '。';
+      } else {
+        doubleEl.textContent = '不会翻倍';
+        noteEl.textContent = '年利率为 0，本金不会增长；同样条件下单利终值也是 ' + money(principal) + '。';
+      }
+    }
+
+    [principalEl, rateEl, yearsEl].forEach((el) => el.addEventListener('input', updateCalculator));
+    frequencyEl.addEventListener('change', updateCalculator);
+    updateCalculator();
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '名义利率 5%，通胀率 2%，实际利率大约是多少？',
+        options: ['7%', '3%', '2.5%', '10%'],
+        answer: 1,
+        explain: '实际利率约等于名义利率减通胀：5% − 2% = 3%。精确算法是 (1.05 ÷ 1.02) − 1，结果也接近 2.9%。'
+      },
+      {
+        question: '用 72 法则估算，年化 6% 时本金翻倍需要多久？',
+        options: ['6 年', '9 年', '12 年', '18 年'],
+        answer: 2,
+        explain: '72 ÷ 6 = 12。精确计算约 11.9 年，72 法则在 5%–15% 的区间内相当准。'
+      },
+      {
+        question: '30 年后复利终值远高于单利，最根本的原因是？',
+        options: [
+          '复利的利率更高',
+          '复利把每期利息也加入本金，让利息继续生息',
+          '单利的本金会减少',
+          '复利不用交税'
+        ],
+        answer: 1,
+        explain: '两者利率和本金相同，差别只在计息基数。复利的利息会继续产生利息，时间越长，差距越大。'
+      },
+      {
+        question: '市场利率上升时，10 年后才能拿到的 100 万，今天值多少？',
+        options: [
+          '变多，因为利率高了',
+          '不变，因为未来金额固定',
+          '变少，因为贴现率上升，未来现金流的现值下降',
+          '无法判断'
+        ],
+        answer: 2,
+        explain: 'PV = FV ÷ (1+r)^n。分母变大，现值变小。这就是利率上升时债券和成长股承压的原因。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch02');
+  </script>
+</body>
+</html>

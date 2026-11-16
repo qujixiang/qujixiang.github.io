@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 6 章 · 央行与货币政策 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    /* 宽松 / 紧缩切换 */
+    .policy {
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .policy__switch {
+      display: inline-flex;
+      gap: 4px;
+      padding: 5px;
+      background: var(--bg-soft);
+      border-radius: 999px;
+      margin-bottom: var(--space-5);
+    }
+
+    .policy__btn {
+      border: none;
+      background: transparent;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink-500);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .policy__btn:hover { color: var(--ink-900); }
+
+    .policy__btn.is-active {
+      background: var(--ink-900);
+      color: #fff;
+    }
+
+    .policy__chain {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--space-2);
+      align-items: stretch;
+    }
+
+    .policy__step {
+      position: relative;
+      padding: var(--space-4) var(--space-3);
+      border-radius: var(--radius-md);
+      background: var(--bg-soft);
+      border: 1px solid var(--ink-100);
+      text-align: center;
+      transition: all .2s;
+    }
+
+    .policy__step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--ink-500);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .policy__step-text {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--ink-700);
+      font-weight: 600;
+    }
+
+    .policy__step-arrow {
+      position: absolute;
+      right: -9px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      color: var(--ink-300);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .policy__chain.is-loose .policy__step {
+      background: #f6fdf9;
+      border-color: #bbf7d0;
+    }
+
+    .policy__chain.is-loose .policy__step-num {
+      background: var(--success-100);
+      color: var(--success-600);
+    }
+
+    .policy__chain.is-loose .policy__step-arrow { color: var(--success-600); }
+
+    .policy__chain.is-tight .policy__step {
+      background: #fff8f8;
+      border-color: #fecaca;
+    }
+
+    .policy__chain.is-tight .policy__step-num {
+      background: var(--danger-100);
+      color: var(--danger-600);
+    }
+
+    .policy__chain.is-tight .policy__step-arrow { color: var(--danger-600); }
+
+    .policy__detail {
+      margin-top: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      background: var(--bg-soft);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--ink-500);
+    }
+
+    .policy__detail strong { color: var(--ink-900); }
+
+    .policy__detail-title {
+      font-weight: 700;
+      color: var(--ink-900);
+      margin-bottom: var(--space-2);
+      font-size: 15px;
+    }
+
+    .policy__meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+    }
+
+    .policy__meta-item {
+      background: #fff;
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+    }
+
+    .policy__meta-label {
+      font-size: 12px;
+      color: var(--ink-300);
+      margin-bottom: 2px;
+    }
+
+    .policy__meta-value {
+      font-weight: 600;
+      color: var(--ink-900);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .policy__chain {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+      }
+
+      .policy__step-arrow {
+        right: auto;
+        left: 50%;
+        top: auto;
+        bottom: -12px;
+        transform: translateX(-50%) rotate(90deg);
+      }
+    }
+
+    /* 央行资产负债表简表 */
+    .bs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+
+    .bs__col {
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .bs__head {
+      background: var(--ink-900);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .bs__row {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      font-size: 14px;
+      border-top: 1px solid var(--ink-100);
+    }
+
+    .bs__row span:last-child {
+      color: var(--gold-600);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 560px) {
+      .bs { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <!-- 侧边目录 -->
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：十天四次熔断</a>
+        <a class="sidebar__link" href="#identity">央行是谁</a>
+        <a class="sidebar__link" href="#balance">央行的资产负债表</a>
+        <a class="sidebar__link" href="#tools">货币政策工具</a>
+        <a class="sidebar__link" href="#transmission">政策如何传到你的钱包</a>
+        <a class="sidebar__link" href="#simulator">动手：宽松 vs 紧缩</a>
+        <a class="sidebar__link" href="#fed">美联储为什么影响全球</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块二 · 金融系统</div>
+        <h1 class="hero__title">央行与货币政策</h1>
+        <p class="hero__lead">
+          央行不生产商品，也不直接给居民发钱。但它的每一次降准、降息，都会改变你的房贷、存款利息和手里的股票。
+        </p>
+      </header>
+
+      <!-- 本章目标 -->
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>说清央行的三个身份，以及它为什么不直接和普通人打交道</span></li>
+          <li><span class="goal-list__check">2</span><span>解释降准、降息、公开市场操作分别改变了什么</span></li>
+          <li><span class="goal-list__check">3</span><span>画出「政策利率 → 你的钱包」的传导链条，并知道它为什么会失灵</span></li>
+        </ul>
+      </section>
+
+      <!-- 开场故事 -->
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">十天四次熔断</h2>
+
+        <div class="story">
+          <div class="story__label">真实事件 · 2020 年 3 月</div>
+          <p>
+            新冠疫情在全球扩散，市场陷入恐慌。2020 年 3 月的十天里，美国股市触发了四次熔断——
+            开盘就跌到暂停交易，这在历史上极其罕见。
+          </p>
+          <p>
+            美联储的反应非常快：3 月 3 日紧急降息 50 个基点，3 月 15 日又把利率降到接近零，
+            并宣布大规模购买国债和住房抵押贷款支持证券。3 月 23 日，它进一步宣布「不限量」购买资产。
+            短短几个月，美联储资产负债表从约 4.2 万亿美元膨胀到约 7 万亿美元。
+          </p>
+          <p>
+            几乎同时，中国央行也宣布定向降准，释放约 5500 亿元长期资金。
+            接下来的故事你都知道了：全球股市反弹，房价上涨，通胀升温；到了 2022 年，
+            美联储又用连续加息把利率迅速拉回去，全球资产重新定价。
+          </p>
+          <div class="story__question">
+            央行既不生产商品，也不直接给居民发钱，为什么它的一举一动，能让房贷、股价、汇率都跟着变？
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          答案在于：央行站在整个金融体系的「总闸门」位置。它不直接给你钱，
+          但它决定<strong>银行借钱的成本、银行能放多少贷、市场上的钱有多少</strong>。
+          这些条件一变，所有资产的价格都会重新计算。
+        </p>
+      </section>
+
+      <!-- 核心概念一 -->
+      <section class="section" id="identity">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">央行是谁：三个身份</h2>
+
+        <p>
+          很多人以为央行是「管银行的政府机关」。这只说对了一部分。
+          央行的特殊之处在于，它同时扮演三个角色，而这三个角色都<strong>不直接面向普通居民和企业</strong>。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 发行的银行</div>
+            <p style="margin-bottom:0;">
+              一个国家只有央行有权发行法定纸币和硬币。你钱包里的现金，本质上是央行的一张「欠条」——
+              它没有利息，但所有人都必须接受。
+            </p>
+            <div class="concept__analogy">
+              像一场大型游戏里的官方货币发行方。只有它能印筹码，其他机构只能赚取和流转筹码。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 银行的银行</div>
+            <p style="margin-bottom:0;">
+              商业银行要在央行开「准备金账户」，就像你在银行开户一样。银行之间转账、清算，
+              最终都在央行的账本上完成。银行缺钱时，也可以拿合格抵押品向央行借。
+              所以央行是「银行的银行」，不是「每个人的银行」。
+            </p>
+            <div class="concept__analogy">
+              像银行的「总行」：普通客户找分行，分行缺头寸时找总行。
+              你拿不到央行的贷款，只能通过商业银行间接获得。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 政府的银行</div>
+            <p style="margin-bottom:0;">
+              央行代理国库收支、管理外汇储备、代表国家参与国际金融事务。
+              政府发债、税收进账、外汇买卖，很多都要经过央行的账户体系。
+            </p>
+            <div class="concept__analogy">
+              像国家的「财务总管」：不负责赚钱，但负责把钱放在哪、怎么记账、怎么和外国结算。
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--info" style="margin-top: var(--space-5);">
+          <div class="card__title">一个关键区别：央行不追求利润</div>
+          <p style="margin-bottom:0;">
+            商业银行的目标是赚钱，央行的目标是<strong>物价稳定、金融稳定、经济增长</strong>。
+            它可以在市场恐慌时亏钱买入资产，也可以在过热时压低需求。
+            「不以盈利为目的」是央行能当裁判的前提。
+          </p>
+        </div>
+      </section>
+
+      <!-- 核心概念二 -->
+      <section class="section" id="balance">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">央行的资产负债表：印钱到底印了什么</h2>
+
+        <p>
+          新闻里常说「央行扩表」「央行缩表」。听起来很抽象，其实就是看央行的资产负债表变大了还是变小了。
+          和普通企业一样，央行也有资产和负债，而且<strong>资产 = 负债 + 资本</strong>。
+        </p>
+
+        <div class="bs">
+          <div class="bs__col">
+            <div class="bs__head">资产端（央行持有什么）</div>
+            <div class="bs__row"><span>外汇储备</span><span>外国资产</span></div>
+            <div class="bs__row"><span>对商业银行的债权</span><span>再贷款、MLF</span></div>
+            <div class="bs__row"><span>对政府的债权</span><span>国债</span></div>
+            <div class="bs__row"><span>其他资产</span><span>黄金等</span></div>
+          </div>
+          <div class="bs__col">
+            <div class="bs__head">负债端（央行欠谁的钱）</div>
+            <div class="bs__row"><span>流通中的现金</span><span>你钱包里的钱</span></div>
+            <div class="bs__row"><span>商业银行准备金</span><span>银行存在央行的钱</span></div>
+            <div class="bs__row"><span>政府存款</span><span>国库资金</span></div>
+            <div class="bs__row"><span>央行票据等</span><span>其他负债</span></div>
+          </div>
+        </div>
+
+        <p>
+          重点来了：所谓「央行印钱」，大多数时候并不是真的印出一张张纸币，而是央行在<strong>资产端买入东西</strong>
+          （比如国债、外汇、对银行的贷款），同时在<strong>负债端记一笔准备金</strong>。
+          资产和负债同时增加，这就是「扩表」。
+        </p>
+
+        <p>
+          反过来，央行卖出资产、收回准备金，资产负债表缩小，就是「缩表」。
+          所以「印钱」的准确含义是：<strong>央行创造出了更多的基础货币（现金 + 准备金）</strong>，
+          而不是凭空给某个人账户打钱。
+        </p>
+
+        <div class="card card--gold">
+          <div class="card__title">为什么这叫「高能货币」</div>
+          <p style="margin-bottom:0;">
+            央行创造的每一元准备金，经过商业银行的存贷款循环，可以派生出好几元的广义货币。
+            这就是第 5 章讲的货币乘数。所以基础货币被称为「高能货币」——
+            它是燃料，乘数决定它能烧出多大的火。
+          </p>
+        </div>
+      </section>
+
+      <!-- 核心概念三 -->
+      <section class="section" id="tools">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">货币政策工具箱：降准、降息、公开市场操作</h2>
+
+        <p>
+          央行调节货币条件，主要靠三类工具。它们的共同目标都是影响「钱的多少」和「钱的贵贱」，
+          但作用的位置不一样。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">① 降准：让银行少锁一点钱</div>
+            <p style="margin-bottom:0;">
+              降低法定存款准备金率，意味着银行每收 100 元存款，需要锁在央行的比例下降，
+              可以放贷的钱变多。降准释放的是<strong>可贷资金</strong>，不是直接进入市场的购买力。
+              银行愿不愿意贷、企业愿不愿意借，是下一步的事。
+            </p>
+            <div class="concept__analogy">
+              像把水库的闸门抬高一点：水（准备金）放出来了，但下游有没有人用水，还要看需求和渠道。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">② 降息：让借钱变便宜</div>
+            <p style="margin-bottom:0;">
+              央行下调政策利率（比如 7 天逆回购利率），会逐步传导到货币市场利率、
+              债券收益率和银行贷款利率。贷款便宜了，企业更愿意投资，居民更愿意买房；
+              存款利息也会跟着下降，把钱往消费和投资上推。
+            </p>
+            <div class="concept__analogy">
+              像降低整个市场的「资金租金」。租金便宜了，租仓库（借钱）的人就多，
+              但前提是有人真的需要仓库。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">③ 公开市场操作：日常的微调水龙头</div>
+            <p style="margin-bottom:0;">
+              央行在金融市场上买卖有价证券、开展回购，来调节短期流动性。
+              <strong>逆回购</strong>是央行把钱借给银行、银行拿债券做抵押，到期还钱赎回债券，属于投放流动性；
+              <strong>MLF</strong>（中期借贷便利）期限更长，银行拿合格债券质押，向央行借中期资金；
+              买卖国债则会影响更长期的流动性。这些操作频率高、金额灵活，是央行最常用的「日常工具」。
+            </p>
+            <div class="concept__analogy">
+              像给水池装了一个可以随时开关的水龙头，而不是只有「大暴雨」和「大旱」两种模式。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">④ 结构性工具：把钱引到特定地方</div>
+            <p style="margin-bottom:0;">
+              除了总量工具，央行还有定向降准、支农支小再贷款、碳减排支持工具等。
+              它们不是「大水漫灌」，而是希望资金流向小微、绿色、科技等特定领域。
+              这类工具规模通常小于总量工具，但更精准。
+            </p>
+            <div class="concept__analogy">
+              像灌溉时不是把整片田都淹了，而是修一条水渠，直接把水引到最干的那块地。
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: var(--space-5);">
+          <div class="card__title">降准和降息，别混为一谈</div>
+          <p style="margin-bottom:0;">
+            降准改变的是<strong>「量」</strong>——银行能用的资金变多；
+            降息改变的是<strong>「价」</strong>——借钱的成本变低。
+            现实中两者经常一起用，但效果和风险并不相同：降准更直接地增加流动性，
+            降息更容易推升资产价格和通胀预期。
+          </p>
+        </div>
+      </section>
+
+      <!-- 核心概念四 -->
+      <section class="section" id="transmission">
+        <div class="section__label">核心概念 四</div>
+        <h2 class="section__title">政策如何传到你的钱包</h2>
+
+        <p>
+          央行调的是「银行之间的利率」，你感受到的是「房贷利率、存款利息、股票价格」。
+          中间隔着一条长长的链条，每一环都可能卡住。
+        </p>
+
+        <div class="card card--gold">
+          <div class="card__title">一条典型的传导链</div>
+          <p style="margin-bottom:0;">
+            政策利率下调 → 货币市场利率下降（银行之间借钱更便宜）→ 债券收益率下降、贷款利率下降 →
+            企业融资成本下降、居民房贷压力减轻 → 投资和消费增加 → 总需求上升 → 物价和就业变化。
+          </p>
+        </div>
+
+        <p style="margin-top: var(--space-4);">
+          这条链条有三个特点，值得记住：
+        </p>
+
+        <p>
+          <strong>第一，有时滞。</strong>从降息到企业真正增加投资、居民真正增加消费，
+          通常要 6 到 18 个月。央行今天降息，不代表下个月经济就回暖。
+        </p>
+
+        <p>
+          <strong>第二，宽货币不等于宽信用。</strong>央行可以让银行有更多准备金，
+          但不能强迫银行放贷，也不能强迫企业借钱。如果企业对未来没信心、居民担心失业，
+          就算利率再低，他们也会选择存钱而不是借钱。日本在 1990 年代后就长期面对这种局面，
+          被称为「流动性陷阱」：钱很多，但就是不去实体里转。
+        </p>
+
+        <p>
+          <strong>第三，资产价格会先反应。</strong>股票、债券、房子对利率最敏感，
+          往往在实体经济感受到变化之前就先涨或先跌。这也是为什么很多人觉得「央行一放水，股市就先涨」——
+          但涨的是估值，不一定是企业盈利。
+        </p>
+
+        <div class="card card--info">
+          <div class="card__title">「宽货币」和「宽信用」的区别</div>
+          <p style="margin-bottom:0;">
+            宽货币是央行把钱给到银行体系；宽信用是银行真的把贷款放出去、企业真的借了。
+            前者是「水龙头开了」，后者是「水流到了田里」。只看降准降息就判断经济会好，
+            往往会高估政策的效果。
+          </p>
+        </div>
+      </section>
+
+      <!-- 交互 -->
+      <section class="section" id="simulator">
+        <div class="section__label">动手试试</div>
+        <h2 class="section__title">宽松和紧缩，分别会发生什么？</h2>
+
+        <p>
+          切换下面两个按钮，看同一条传导链在「宽松」和「紧缩」两种模式下如何反向变化。
+          注意：这只是方向性的推演，现实中的幅度和时点会复杂得多。
+        </p>
+
+        <div class="policy">
+          <div class="policy__switch" role="group" aria-label="货币政策模式">
+            <button type="button" class="policy__btn is-active" data-mode="loose">宽松 · 降准降息</button>
+            <button type="button" class="policy__btn" data-mode="tight">紧缩 · 加息提准</button>
+          </div>
+
+          <div class="policy__chain is-loose" id="policy-chain"></div>
+          <div class="policy__detail" id="policy-detail"></div>
+        </div>
+
+        <p style="margin-top: var(--space-4);">
+          多切换几次，你会发现：宽松和紧缩不是「好」和「坏」，而是央行在不同处境下的取舍。
+          经济太冷时踩油门，经济过热时踩刹车。真正难的是：踩下去的力度、时机，以及市场会不会配合。
+        </p>
+      </section>
+
+      <!-- 美联储 -->
+      <section class="section" id="fed">
+        <div class="section__label">延伸</div>
+        <h2 class="section__title">为什么美联储加息，全球都抖</h2>
+
+        <p>
+          美联储是美国的央行，但它的一举一动会影响全世界。原因不是美国能命令别国，
+          而是美元在国际金融体系里的特殊地位。
+        </p>
+
+        <p>
+          <strong>第一，美元是全球最主要的贸易计价和融资货币。</strong>
+          石油、大豆、芯片设备，很多大宗商品用美元报价；很多国家和企业借的也是美元债。
+        </p>
+
+        <p>
+          <strong>第二，美债收益率是全球资产的「无风险利率锚」。</strong>
+          股票、债券、房地产的估值，都要和一个「安全收益率」比较。美债收益率上升，
+          全球风险资产的吸引力就下降，资金会重新配置。
+        </p>
+
+        <p>
+          <strong>第三，加息会推动资本回流美国。</strong>
+          美元资产利息更高，资金从新兴市场撤出，换成美元回到美国。结果是：
+          新兴市场货币贬值、进口成本上升、还美元债更贵，甚至引发资本外逃和金融危机。
+        </p>
+
+        <div class="card">
+          <div class="card__title">中国为什么相对稳一些</div>
+          <p style="margin-bottom:0;">
+            中国有资本项目管理，汇率也不是完全自由浮动，所以外部冲击会被缓冲一部分。
+            但这不代表完全隔离：外资流动、人民币汇率、输入性通胀，以及国内货币政策的空间，
+            仍然会受到美联储的影响。这就是开放经济里的「不可能三角」：
+            资本自由流动、固定汇率、独立货币政策，三者最多同时满足两个。
+          </p>
+        </div>
+      </section>
+
+      <!-- 误区 -->
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">央行印钱，就是直接给老百姓发钱</div>
+            <div class="myth__right">
+              央行主要通过银行体系和金融市场投放流动性。先变成银行的准备金，
+              再通过贷款、买债等方式进入市场。普通人感受到的是利率和资产价格的变化，
+              而不是账户里突然多了一笔钱。
+            </div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">降准降息，股市就一定涨</div>
+            <div class="myth__right">
+              宽货币不等于宽信用。股市还取决于企业盈利、风险偏好和估值水平；
+              政策有时滞，也可能出现「利好出尽」。降息是条件改善，不是上涨保证。
+            </div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">央行能精确控制利率和通胀</div>
+            <div class="myth__right">
+              央行只能「影响」，不能精确「控制」。它面对的是千千万万个家庭和企业的预期与选择，
+              还要受全球环境、金融创新和政策时滞的约束。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <!-- 术语卡 -->
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">货币政策<span class="glossary__en">Monetary Policy</span></div>
+            <div class="glossary__def">央行通过调节货币数量和资金价格，影响经济与物价的政策。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">存款准备金率<span class="glossary__en">Reserve Requirement Ratio</span></div>
+            <div class="glossary__def">银行必须按存款一定比例缴存央行的资金比率，降准即下调该比率。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">政策利率<span class="glossary__en">Policy Rate</span></div>
+            <div class="glossary__def">央行直接设定或引导的基准利率，是其他利率的起点。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">公开市场操作<span class="glossary__en">Open Market Operations</span></div>
+            <div class="glossary__def">央行在金融市场买卖证券、开展回购，调节短期流动性。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">逆回购<span class="glossary__en">Reverse Repo</span></div>
+            <div class="glossary__def">央行向银行放款、银行以债券质押，到期收回，属于投放流动性。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">MLF<span class="glossary__en">Medium-term Lending Facility</span></div>
+            <div class="glossary__def">中期借贷便利，银行以合格债券质押向央行借中期资金。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">扩表 / 缩表<span class="glossary__en">Balance Sheet Expansion</span></div>
+            <div class="glossary__def">央行资产负债表规模变大或变小，对应基础货币的投放与回收。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">传导机制<span class="glossary__en">Transmission Mechanism</span></div>
+            <div class="glossary__def">政策利率变化经过银行、市场、资产价格，最终影响实体经济的路径。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 下一章 -->
+      <section class="section">
+        <a class="next-chapter" href="../07-financial-markets/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 7 章</div>
+            <div class="next-chapter__title">金融市场地图：钱从谁流向谁</div>
+          </div>
+          <span class="next-chapter__link">继续学习 →</span>
+        </a>
+      </section>
+
+      <!-- 完成 -->
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 宽松 / 紧缩切换 ---------- */
+    const POLICY = {
+      loose: {
+        steps: [
+          '政策利率下调<br>准备金率下调',
+          '银行资金成本<br>下降',
+          '贷款更便宜<br>可贷额度增加',
+          '企业投资、居民<br>买房消费增加',
+          '总需求与资产<br>价格上升'
+        ],
+        title: '宽松模式：降准 + 降息',
+        desc: '央行的目标是托住需求、避免经济过冷。它先降低银行的资金成本，再希望银行把便宜的钱贷出去。但钱能不能到实体，取决于银行的风险偏好和企业的借款意愿。',
+        meta: [
+          ['谁先受影响', '银行、债券市场、房地产'],
+          ['见效时间', '通常 6–18 个月'],
+          ['主要风险', '资产泡沫、通胀反弹、汇率贬值压力']
+        ]
+      },
+      tight: {
+        steps: [
+          '政策利率上调<br>准备金率上调',
+          '银行资金成本<br>上升',
+          '贷款更贵<br>可贷额度收紧',
+          '企业投资、居民<br>买房消费降温',
+          '总需求与资产<br>价格回落'
+        ],
+        title: '紧缩模式：加息 + 提准',
+        desc: '央行的目标是给过热的需求和通胀降温。它提高资金成本、收紧流动性，让借钱变贵。副作用是经济增长可能放缓，高负债的企业和家庭压力会明显上升。',
+        meta: [
+          ['谁先受影响', '高负债企业、房贷家庭、成长股'],
+          ['见效时间', '通常 6–18 个月'],
+          ['主要风险', '经济失速、债务违约、资产价格下跌']
+        ]
+      }
+    };
+
+    const chainEl = document.getElementById('policy-chain');
+    const detailEl = document.getElementById('policy-detail');
+    const modeButtons = Array.from(document.querySelectorAll('.policy__btn'));
+
+    function renderPolicy(mode) {
+      const data = POLICY[mode];
+      chainEl.className = 'policy__chain is-' + mode;
+      chainEl.innerHTML = data.steps.map((text, i) => `
+        <div class="policy__step">
+          <div class="policy__step-num">${i + 1}</div>
+          <div class="policy__step-text">${text}</div>
+          ${i < data.steps.length - 1 ? '<span class="policy__step-arrow">→</span>' : ''}
+        </div>
+      `).join('');
+
+      detailEl.innerHTML = `
+        <div class="policy__detail-title">${data.title}</div>
+        <p style="margin-bottom:0;">${data.desc}</p>
+        <div class="policy__meta">
+          ${data.meta.map(([label, value]) => `
+            <div class="policy__meta-item">
+              <div class="policy__meta-label">${label}</div>
+              <div class="policy__meta-value">${value}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      modeButtons.forEach((btn) => {
+        btn.classList.toggle('is-active', btn.dataset.mode === mode);
+      });
+    }
+
+    modeButtons.forEach((btn) => {
+      btn.addEventListener('click', () => renderPolicy(btn.dataset.mode));
+    });
+    renderPolicy('loose');
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '央行「降准」的直接效果是什么？',
+        options: [
+          '商业银行可以使用的资金增加',
+          '老百姓的存款利息立刻增加',
+          '政府税收增加',
+          '股票价格立刻上涨'
+        ],
+        answer: 0,
+        explain: '降准降低法定准备金率，银行每 100 元存款要锁在央行的比例下降，可贷资金因此增加。'
+      },
+      {
+        question: '央行「印钱」在资产负债表上，首先表现为？',
+        options: [
+          '资产端和负债端同时增加',
+          '只有资产端增加',
+          '只有负债端增加',
+          '资产端和负债端同时减少'
+        ],
+        answer: 0,
+        explain: '央行买入资产（如国债）的同时，在负债端记一笔准备金。资产和负债同时扩张，就是扩表。'
+      },
+      {
+        question: '美联储加息影响全球，最核心的渠道是？',
+        options: [
+          '美国直接命令其他国家跟随加息',
+          '美元资产收益率上升，资本回流美国、美元走强',
+          '美国提高进口关税',
+          '美国停止向其他国家出口商品'
+        ],
+        answer: 1,
+        explain: '美元是全球主要融资和储备货币。美债收益率上升会吸引资本回流，推高美元，给新兴市场带来贬值和外债压力。'
+      },
+      {
+        question: '为什么说「宽货币不等于宽信用」？',
+        options: [
+          '因为央行不能创造货币',
+          '因为银行可能不愿放贷、企业也可能不愿借钱',
+          '因为降准对银行没有影响',
+          '因为贷款利率不会变化'
+        ],
+        answer: 1,
+        explain: '央行能把准备金给到银行体系，但不能强迫银行放贷，也不能强迫企业投资。需求不足时，钱会停在银行体系里。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch06');
+  </script>
+</body>
+</html>

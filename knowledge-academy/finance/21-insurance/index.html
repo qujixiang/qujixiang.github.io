@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 21 章 · 保险：用小钱转移大风险 | 金融课</title>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <style>
+    .tool {
+      background: var(--bg-card);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+      margin: var(--space-5) 0;
+    }
+    .tool__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-4);
+    }
+    .tool__field { display: flex; flex-direction: column; gap: var(--space-2); }
+    .tool__field label { font-size: 14px; font-weight: 650; color: var(--ink-700); }
+    .tool__field input[type="range"] { width: 100%; accent-color: var(--gold-500); }
+    .tool__num {
+      font-size: 1.15rem;
+      font-weight: 750;
+      color: var(--ink-900);
+      font-variant-numeric: tabular-nums;
+    }
+    .tool__num small { font-size: 13px; font-weight: 500; color: var(--ink-300); }
+    .tool__output {
+      margin-top: var(--space-5);
+      padding: var(--space-4);
+      background: var(--bg-soft);
+      border-radius: var(--radius-md);
+    }
+    .tool__big {
+      font-size: 2rem;
+      font-weight: 750;
+      color: var(--gold-600);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+    .tool__line {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-3);
+      font-size: 14px;
+      color: var(--ink-500);
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--ink-100);
+    }
+    .tool__line:last-child { border-bottom: none; }
+    .tool__line b { color: var(--ink-900); font-variant-numeric: tabular-nums; }
+    .tool__bar {
+      display: flex;
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: var(--space-3) 0;
+      background: var(--ink-100);
+    }
+    .tool__bar span { display: block; height: 100%; }
+    .tool__note { font-size: 13px; color: var(--ink-300); margin-top: var(--space-3); }
+
+    .type-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: var(--space-4) 0; }
+    .type-table th, .type-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--ink-100); vertical-align: top; }
+    .type-table th { background: var(--bg-soft); color: var(--ink-700); font-weight: 650; white-space: nowrap; }
+    .type-table td { color: var(--ink-500); }
+    .type-table td:first-child { color: var(--ink-900); font-weight: 650; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <div class="course-shell">
+    <aside class="sidebar">
+      <a class="sidebar__back" href="../index.html">← 返回课程目录</a>
+      <div class="sidebar__title">本章目录</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="#goals">本章目标</a>
+        <a class="sidebar__link" href="#story">开场：一场病，撕开一个口子</a>
+        <a class="sidebar__link" href="#pooling">保险的本质：风险汇聚</a>
+        <a class="sidebar__link" href="#types">四大险种各管什么</a>
+        <a class="sidebar__link" href="#coverage">保额该定多少</a>
+        <a class="sidebar__link" href="#calculator">算一算你家的缺口</a>
+        <a class="sidebar__link" href="#traps">产品里的三个坑</a>
+        <a class="sidebar__link" href="#myths">三个常见误区</a>
+        <a class="sidebar__link" href="#quiz">90 秒测验</a>
+        <a class="sidebar__link" href="#glossary">术语卡</a>
+      </nav>
+    </aside>
+
+    <article class="article">
+      <header class="hero">
+        <div class="hero__eyebrow">模块六 · 个人实战</div>
+        <h1 class="hero__title">保险：用小钱转移大风险</h1>
+        <p class="hero__lead">
+          你每年交几千块保费，可能一次都没用上。这不是「白交」，而是你花钱买走了那个「万一」。
+          这一章讲清楚：保险到底在保什么、该买哪几种、保额该定多少。
+        </p>
+      </header>
+
+      <section class="section" id="goals">
+        <div class="section__label">本章目标</div>
+        <h2 class="section__title">学完这一章，你能</h2>
+        <ul class="goal-list">
+          <li><span class="goal-list__check">1</span><span>说清保险的本质是「风险汇聚」，而不是一种理财收益</span></li>
+          <li><span class="goal-list__check">2</span><span>分清医疗险、重疾险、意外险、寿险分别解决什么问题，不重复也不遗漏</span></li>
+          <li><span class="goal-list__check">3</span><span>用「收入替代 + 负债覆盖 − 已有保额」算出自己家庭的保障缺口</span></li>
+        </ul>
+      </section>
+
+      <section class="section" id="story">
+        <div class="section__label">开场</div>
+        <h2 class="section__title">一场病，撕开一个口子</h2>
+
+        <div class="story">
+          <div class="story__label">一个典型中产家庭的账本</div>
+          <p>
+            老陈 38 岁，在一家互联网公司做中层，家庭年收入 45 万。太太做兼职，孩子 6 岁。
+            家里有一套房子，房贷还剩 260 万，每个月还 1.5 万。
+          </p>
+          <p>
+            2021 年体检查出问题，手术加后续治疗，医保报销后自费了 28 万。更麻烦的是，他休养了 14 个月，
+            期间只拿基本工资。<strong>收入锐减，房贷、学费、生活费一样没少。</strong>
+          </p>
+          <p>
+            家里先卖了一只基金——正好卖在低点，亏了 15%；又向父母借了 20 万。
+            一场病没有击垮这个家庭，但把过去五年的积蓄抹掉了大半。
+          </p>
+          <p>
+            事后他算账：如果当年买了 100 万保额的重疾险，每年保费大约 1.2 万，五年共 6 万。
+            这次事件造成的收入损失加自费医疗，超过 80 万。<strong>6 万对 80 万。</strong>
+          </p>
+          <div class="story__question">
+            保险公司收 1.2 万，却可能赔 100 万。它凭什么不亏？这背后是一套很朴素的数学。
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="pooling">
+        <div class="section__label">核心概念 一</div>
+        <h2 class="section__title">保险的本质：把不确定的大损失，换成确定的小支出</h2>
+
+        <p>
+          一个人面对重疾风险，就像在赌博：大概率没事，小概率破产。而保险做的事情，是把一万个这样的人
+          放进同一个池子，让<strong>群体可预测的平均损失</strong>，替代<strong>个体不可预测的极端损失</strong>。
+        </p>
+
+        <div class="card card--gold">
+          <div class="card__title">一笔简单的账</div>
+          <p style="margin-bottom:0;">
+            假设 1 万人投保，统计显示这个年龄段每年约 0.5% 的人会发生需要赔付 50 万的事件，
+            也就是 50 人，预期赔付 2500 万。摊到每个人头上是 2500 元，再加运营、渠道成本和利润，
+            每人每年收 3000 元左右，保险公司才不会亏。
+            <strong>保费不是拍脑袋定的，它是「预期赔付 ÷ 投保人数」再加附加费用。</strong>
+          </p>
+        </div>
+
+        <p>
+          所以「保险公司为什么不会亏」的答案是：<strong>它不需要预测哪一个人会出事，只需要预测一群人里大概有多少人会出事。</strong>
+          样本越大，这个比例越稳定。这就是大数定律。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">保险是一个「风险池」，不是「储蓄罐」</div>
+            <p style="margin-bottom:0;">
+              你交的保费里，一部分变成了今年出险人的赔款，一部分是保险公司的运营和渠道成本，剩下才是利润。
+              没有出险，不代表钱白交了——你买到的是这一年里「不用担心」的状态。
+            </p>
+            <div class="concept__analogy">
+              像小区每户出 200 块维护消防系统。你家没着火，但整栋楼的安全是真的。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">保费 = 纯保费 + 附加费用</div>
+            <p style="margin-bottom:0;">
+              纯保费对应「预期赔付」，附加费用覆盖销售佣金、运营、核保理赔成本。
+              同样的保障，线上产品往往比线下便宜，主要差在附加费用上，而不是「便宜没好货」。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">保险保的是「财务后果」，不是「健康本身」</div>
+            <p style="margin-bottom:0;">
+              保险不能让你不生病，也不能让病好得更快。它唯一的作用是：当坏事发生时，
+              <strong>让钱的问题不叠加在健康问题之上</strong>。
+            </p>
+            <div class="concept__analogy">
+              像汽车的备胎。它不能防止爆胎，但爆胎时你不至于被困在高速上。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="types">
+        <div class="section__label">核心概念 二</div>
+        <h2 class="section__title">四大险种，各管一段</h2>
+
+        <p>
+          市面上产品名字眼花缭乱，但底层只有四类保障。理解它们「赔什么、怎么赔」，就不会被话术带走。
+        </p>
+
+        <table class="type-table">
+          <thead>
+            <tr>
+              <th>险种</th>
+              <th>赔什么</th>
+              <th>怎么赔</th>
+              <th>解决的核心问题</th>
+              <th>参考成本</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>医疗险</td>
+              <td>住院、手术、药品等医疗费用</td>
+              <td>报销型：花多少报多少，扣除免赔额，不能重复赔</td>
+              <td>「治病贵」——大额医疗费</td>
+              <td>几百元 / 年，保额数百万</td>
+            </tr>
+            <tr>
+              <td>重疾险</td>
+              <td>合同约定的重大疾病</td>
+              <td>给付型：确诊即赔一笔钱，随便你怎么花</td>
+              <td>「不能工作」——收入中断与康复支出</td>
+              <td>几千元 / 年，保额 30–50 万起</td>
+            </tr>
+            <tr>
+              <td>意外险</td>
+              <td>意外身故、伤残、意外医疗</td>
+              <td>给付 + 报销组合</td>
+              <td>「突发意外」——杠杆最高的保障</td>
+              <td>几百元 / 年，保额可达百万</td>
+            </tr>
+            <tr>
+              <td>寿险（定期）</td>
+              <td>身故或全残</td>
+              <td>给付型：赔给受益人</td>
+              <td>「人不在了，房贷谁还、孩子谁养」</td>
+              <td>千元级 / 年，保额可达数百万</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="card card--info">
+          <div class="card__title">一个最容易被忽略的原则</div>
+          <p style="margin-bottom:0;">
+            <strong>先保家庭经济支柱，再保孩子和老人。</strong>
+            很多家庭给孩子买齐了保险，大人却在「裸奔」。可家庭现金流靠的是大人：
+            大人出事，孩子的保费都交不上。孩子真正需要的，是医疗险和意外险这种便宜的基础保障。
+          </p>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          四类险种之间有清晰的分工：医疗险报销医药费，重疾险补收入，意外险应对突发，
+          寿险兜住家庭责任。<strong>它们不是互相替代，而是拼成一张完整的网。</strong>
+          预算有限时，优先级通常是：医疗险 → 意外险 → 重疾险 → 定期寿险。
+        </p>
+      </section>
+
+      <section class="section" id="coverage">
+        <div class="section__label">核心概念 三</div>
+        <h2 class="section__title">保额该定多少：先算缺口，再看产品</h2>
+
+        <p>
+          大部分人买保险的顺序是反的：先看哪个产品火、哪个代理人热情，最后才问「保额够不够」。
+          正确的顺序是<strong>先算清楚家庭需要多少钱，再去找能覆盖这个数字的产品</strong>。
+        </p>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">第一步：收入替代</div>
+            <p style="margin-bottom:0;">
+              家庭主要收入者如果倒下，家里需要几年才能缓过来？通常按 <strong>5–10 年的年收入</strong>估算。
+              这笔钱不是让人「发财」，而是让家庭有时间调整、孩子能继续上学。
+            </p>
+            <div class="concept__analogy">
+              像给家庭装一个缓冲垫：坠落时不一定接得住全部，但至少不会直接摔到地上。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">第二步：覆盖负债</div>
+            <p style="margin-bottom:0;">
+              房贷、车贷、经营贷，这些是「人不在也必须还」的刚性支出。
+              把它们单独加进保额，不要让家人用理赔金去补收入的窟窿，又还不上贷款。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">第三步：扣掉已有保障</div>
+            <p style="margin-bottom:0;">
+              社保、公司团险、已经买过的保单，都算「已有保额」。很多人重复买了三四份医疗险，
+              结果都是报销型，不能叠加赔付，多花的钱几乎白费。
+            </p>
+          </div>
+        </div>
+
+        <div class="card card--gold" style="margin-top: var(--space-5);">
+          <div class="card__title">一个可以背下来的公式</div>
+          <p style="margin-bottom:0;">
+            <strong>保障缺口 = 年收入 × 需要支撑的年数 + 未还负债 − 已有保额</strong><br>
+            算出来的数字，才是你真正需要买的寿险/身故保额。重疾险的保额通常单独看，
+            建议至少覆盖 <strong>3–5 年的年收入</strong>，因为你失去的是工作能力，而不只是医药费。
+          </p>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+          保费预算方面，行业里常说「年收入 5%–10%」。这个比例只能当参考，
+          更重要的是<strong>先保额、后保费</strong>：宁可买定期、买消费型，也不要把保额压缩到不够用。
+          30 岁的人买 100 万定期寿险，一年可能只要一千多；同样预算如果拿去买返还型，保额可能只剩三分之一。
+        </p>
+      </section>
+
+      <section class="section" id="calculator">
+        <div class="section__label">动手算一算</div>
+        <h2 class="section__title">你家的保障缺口有多大</h2>
+
+        <p>
+          下面这个小工具用「收入替代 + 负债覆盖 − 已有保额」的简化模型。
+          拖动滑块，看看你家的数字。它不构成投保建议，但能帮你建立一个量级感。
+        </p>
+
+        <div class="tool">
+          <div class="tool__grid">
+            <div class="tool__field">
+              <label for="income">家庭年收入</label>
+              <input type="range" id="income" min="10" max="200" step="5" value="40">
+              <div class="tool__num"><span id="income-val">40</span> <small>万元 / 年</small></div>
+            </div>
+            <div class="tool__field">
+              <label for="debt">未还负债（房贷、车贷等）</label>
+              <input type="range" id="debt" min="0" max="600" step="10" value="200">
+              <div class="tool__num"><span id="debt-val">200</span> <small>万元</small></div>
+            </div>
+            <div class="tool__field">
+              <label for="existing">已有保额（社保、团险、已购保单）</label>
+              <input type="range" id="existing" min="0" max="500" step="10" value="50">
+              <div class="tool__num"><span id="existing-val">50</span> <small>万元</small></div>
+            </div>
+            <div class="tool__field">
+              <label for="years">需要支撑的年数</label>
+              <input type="range" id="years" min="5" max="20" step="1" value="10">
+              <div class="tool__num"><span id="years-val">10</span> <small>年</small></div>
+            </div>
+          </div>
+
+          <div class="tool__output">
+            <div style="font-size:13px;color:var(--ink-500);margin-bottom:4px;">建议身故/寿险保额</div>
+            <div class="tool__big"><span id="gap">550</span> 万元</div>
+            <div class="tool__bar" id="gap-bar">
+              <span id="bar-income" style="background:var(--gold-500);"></span>
+              <span id="bar-debt" style="background:var(--info-600);"></span>
+              <span id="bar-existing" style="background:var(--ink-300);"></span>
+            </div>
+            <div class="tool__line"><span>收入替代（年收入 × 支撑年数）</span><b><span id="part-income">400</span> 万</b></div>
+            <div class="tool__line"><span>负债覆盖</span><b><span id="part-debt">200</span> 万</b></div>
+            <div class="tool__line"><span>已有保障抵扣</span><b>− <span id="part-existing">50</span> 万</b></div>
+            <div class="tool__line"><span>重疾险保额建议（3–5 年年收入）</span><b><span id="ci-low">120</span> – <span id="ci-high">200</span> 万</b></div>
+            <div class="tool__line"><span>年保费预算参考（年收入 5%–10%）</span><b><span id="premium-low">2.0</span> – <span id="premium-high">4.0</span> 万</b></div>
+            <p class="tool__note" id="calc-note"></p>
+          </div>
+        </div>
+
+        <p>
+          注意结果里的两个数字：<strong>寿险保额</strong>和<strong>重疾保额</strong>不是一回事。
+          寿险是「人不在了赔给家人」，重疾险是「人还在但不能工作，赔给自己」。
+          前者对应房贷和家庭责任，后者对应收入中断，两者要分开配置。
+        </p>
+      </section>
+
+      <section class="section" id="traps">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">产品里的三个坑，看懂就不会被绕</h2>
+
+        <div class="concept">
+          <div class="concept__item">
+            <div class="concept__name">坑一：返还型 / 分红型，用「不亏」包装高保费</div>
+            <p style="margin-bottom:0;">
+              「有病赔钱，没病返本」听起来很划算。但同样保额，返还型保费往往是消费型的 2–3 倍。
+              多交的那部分钱，保险公司拿去投资，几十年后把本金还你——考虑通胀后，实际收益可能还不如自己定投指数基金。
+              <strong>保障归保障，投资归投资。</strong>
+            </p>
+            <div class="concept__analogy">
+              像买一部「十年后返全款」的手机，价格是原价三倍。你不是免费拿手机，你是分期买了一笔很差的理财。
+            </div>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">坑二：一张保单塞进十几个责任</div>
+            <p style="margin-bottom:0;">
+              捆绑型产品把寿险、重疾、意外、医疗打包，看起来「一站式」。问题是每一项保额都不高，
+              而且主险和附加险共享保额：重疾赔了，寿险保额跟着减少。你以为买了好几层保障，实际只有一层。
+            </p>
+          </div>
+
+          <div class="concept__item">
+            <div class="concept__name">坑三：健康告知随便填</div>
+            <p style="margin-bottom:0;">
+              投保时的健康问卷必须如实填写。有人觉得「没住过院就不用说」，
+              但体检异常、长期用药都可能属于告知范围。<strong>隐瞒的后果不是加费，而是出险时直接拒赔。</strong>
+              「两年不可抗辩」不是免死金牌，故意隐瞒不受保护。
+            </p>
+          </div>
+        </div>
+
+        <div class="card card--info" style="margin-top: var(--space-5);">
+          <div class="card__title">读一份保单，只看四个数字</div>
+          <p style="margin-bottom:0;">
+            <strong>保额</strong>（出事赔多少）、<strong>保费</strong>（每年交多少）、
+            <strong>保障期</strong>（保到多少岁）、<strong>免赔额与免责条款</strong>（哪些情况不赔）。
+            把这四项写在纸上，比听一小时产品讲解更有用。
+          </p>
+        </div>
+      </section>
+
+      <section class="section" id="myths">
+        <div class="section__label">避坑</div>
+        <h2 class="section__title">三个常见误区</h2>
+
+        <div class="myth">
+          <div class="myth__item">
+            <div class="myth__wrong">保险是一种理财，收益越高越好</div>
+            <div class="myth__right">保险是消费，买的是风险转移。追求收益应该用存款、债券、基金，两者分开算账。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">没出险就是白交钱，返还型才不亏</div>
+            <div class="myth__right">没出险说明你这一年平安，这是最好的结果。返还型多交的保费，机会成本往往远高于返还金额。</div>
+          </div>
+          <div class="myth__item">
+            <div class="myth__wrong">先给孩子买，大人以后再补</div>
+            <div class="myth__right">家庭现金流来自大人。大人倒下，孩子的保费和整个家庭都会断供，先保经济支柱。</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="quiz">
+        <div class="section__label">检验一下</div>
+        <h2 class="section__title">90 秒测验</h2>
+
+        <div class="quiz" id="quiz-root">
+          <div class="quiz__meta">
+            <span>共 4 题 · 选完即时反馈</span>
+            <span class="quiz__progress">第 1 / 4 题</span>
+          </div>
+          <div class="quiz__question"></div>
+          <div class="quiz__options"></div>
+          <div class="quiz__feedback"></div>
+          <button type="button" class="btn btn--primary quiz__next">下一题 →</button>
+          <div class="quiz__result"></div>
+        </div>
+      </section>
+
+      <section class="section" id="glossary">
+        <div class="section__label">带走这些</div>
+        <h2 class="section__title">术语卡</h2>
+
+        <div class="glossary">
+          <div class="glossary__item">
+            <div class="glossary__term">保费<span class="glossary__en">Premium</span></div>
+            <div class="glossary__def">投保人为获得保障每年支付的费用。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">保额<span class="glossary__en">Sum Insured</span></div>
+            <div class="glossary__def">出险时保险公司最多赔付的金额，是买保险真正要看的数字。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">风险汇聚<span class="glossary__en">Risk Pooling</span></div>
+            <div class="glossary__def">把大量独立风险集中起来，用群体的平均损失替代个体的极端损失。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">大数定律<span class="glossary__en">Law of Large Numbers</span></div>
+            <div class="glossary__def">样本量越大，事件发生的频率越接近真实概率，保险定价的基础。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">免赔额<span class="glossary__en">Deductible</span></div>
+            <div class="glossary__def">保险公司开始赔付前，需要自己承担的那部分金额。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">给付型 vs 报销型</div>
+            <div class="glossary__def">给付型确诊即赔一笔钱，可自由支配；报销型按实际花费补偿，不能重复赔。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">定期寿险<span class="glossary__en">Term Life</span></div>
+            <div class="glossary__def">在约定期间内身故或全残才赔，保费低、保额高，适合覆盖房贷和家庭责任。</div>
+          </div>
+          <div class="glossary__item">
+            <div class="glossary__term">健康告知<span class="glossary__en">Health Disclosure</span></div>
+            <div class="glossary__def">投保时如实申报健康状况的义务，隐瞒可能导致出险后被拒赔。</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <a class="next-chapter" href="../22-debt-and-credit/index.html" style="text-decoration:none;">
+          <div>
+            <div class="next-chapter__label">下一章 · 第 22 章</div>
+            <div class="next-chapter__title">负债与信用</div>
+          </div>
+          <span class="next-chapter__link">继续学习 →</span>
+        </a>
+      </section>
+
+      <div class="complete-bar">
+        <span class="complete-bar__status" id="complete-status">学完记得标记，方便下次继续</span>
+        <button type="button" class="btn btn--primary" id="mark-complete">标记本章完成</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="../../assets/js/progress.js"></script>
+  <script src="../../assets/js/quiz.js"></script>
+  <script>
+    /* ---------- 阅读进度 ---------- */
+    const progressBar = document.getElementById('reading-progress');
+    window.addEventListener('scroll', () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    }, { passive: true });
+
+    /* ---------- 侧边目录高亮 ---------- */
+    const links = Array.from(document.querySelectorAll('.sidebar__link'));
+    const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) => l.classList.remove('is-active'));
+        const active = links.find((l) => l.getAttribute('href') === '#' + entry.target.id);
+        if (active) active.classList.add('is-active');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach((s) => observer.observe(s));
+
+    /* ---------- 保障缺口计算器 ---------- */
+    const inputs = {
+      income: document.getElementById('income'),
+      debt: document.getElementById('debt'),
+      existing: document.getElementById('existing'),
+      years: document.getElementById('years')
+    };
+
+    function fmt(n) {
+      return Number(n).toLocaleString('zh-CN');
+    }
+
+    function calc() {
+      const income = Number(inputs.income.value);
+      const debt = Number(inputs.debt.value);
+      const existing = Number(inputs.existing.value);
+      const years = Number(inputs.years.value);
+
+      document.getElementById('income-val').textContent = income;
+      document.getElementById('debt-val').textContent = debt;
+      document.getElementById('existing-val').textContent = existing;
+      document.getElementById('years-val').textContent = years;
+
+      const incomePart = income * years;
+      const rawGap = incomePart + debt - existing;
+      const gap = Math.max(0, rawGap);
+
+      document.getElementById('gap').textContent = fmt(gap);
+      document.getElementById('part-income').textContent = fmt(incomePart);
+      document.getElementById('part-debt').textContent = fmt(debt);
+      document.getElementById('part-existing').textContent = fmt(existing);
+      document.getElementById('ci-low').textContent = fmt(income * 3);
+      document.getElementById('ci-high').textContent = fmt(income * 5);
+      document.getElementById('premium-low').textContent = (income * 0.05).toFixed(1);
+      document.getElementById('premium-high').textContent = (income * 0.1).toFixed(1);
+
+      const total = Math.max(1, incomePart + debt);
+      document.getElementById('bar-income').style.width = (incomePart / total) * 100 + '%';
+      document.getElementById('bar-debt').style.width = (debt / total) * 100 + '%';
+      document.getElementById('bar-existing').style.width = 0;
+
+      const note = document.getElementById('calc-note');
+      if (rawGap <= 0) {
+        note.textContent = '已有保障已经覆盖计算出的缺口。仍需确认：保障期限是否覆盖到房贷还清、孩子独立。';
+      } else if (gap > income * 12) {
+        note.textContent = '缺口超过 12 年收入，说明负债或家庭责任较重。优先用定期寿险覆盖负债部分，保费会低很多。';
+      } else {
+        note.textContent = '提示：寿险保额优先覆盖负债，重疾险保额对齐 3–5 年收入。两者分开买，通常比捆绑更便宜。';
+      }
+    }
+
+    Object.values(inputs).forEach((el) => el.addEventListener('input', calc));
+    calc();
+
+    /* ---------- 测验 ---------- */
+    KAQuiz.initQuiz(document.getElementById('quiz-root'), [
+      {
+        question: '保险能让保险公司不亏的核心原因是？',
+        options: [
+          '保险公司能预测具体哪一个人会出事',
+          '保费一定高于赔付',
+          '大数定律让群体的出险比例变得可预测',
+          '大部分人不敢理赔'
+        ],
+        answer: 2,
+        explain: '个体风险不可预测，但大量独立风险汇聚后，群体出险比例会趋于稳定，这是保险定价的基础。'
+      },
+      {
+        question: '已经有一份医疗险，再买一份医疗险，通常的结果是？',
+        options: [
+          '两份都能赔，等于赚了',
+          '报销型不能重复赔，第二份基本浪费',
+          '第二份会自动升级保额',
+          '两份会合并成一份'
+        ],
+        answer: 1,
+        explain: '医疗险是报销型，按实际花费补偿，多家公司加起来也不会超过实际支出。要补的是保额和保障范围，不是重复买。'
+      },
+      {
+        question: '家庭保障应该优先给谁配置？',
+        options: [
+          '孩子，因为孩子最重要',
+          '老人，因为老人容易生病',
+          '家庭经济支柱，因为家庭现金流靠他',
+          '谁先过生日就先给谁买'
+        ],
+        answer: 2,
+        explain: '大人是家庭现金流的来源。大人出事，全家的保费、房贷、生活费都会断，所以先保经济支柱。'
+      },
+      {
+        question: '「返还型保险没病返本，所以不亏」这个说法的问题在哪？',
+        options: [
+          '返还型保险根本不存在',
+          '多交的保费有机会成本，实际收益往往不如自己投资',
+          '返还的钱要交很重的税',
+          '返还型保险不受法律保护'
+        ],
+        answer: 1,
+        explain: '返还型保费通常是消费型的 2–3 倍。多交的钱被占用几十年，考虑通胀和机会成本后，返本并不划算。'
+      }
+    ]);
+
+    /* ---------- 完成标记 ---------- */
+    KAProgress.bindCompleteButton('finance', 'ch21');
+  </script>
+</body>
+</html>
